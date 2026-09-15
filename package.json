@@ -17,6 +17,7 @@
     "node": ">=20.19.0"
   },
   "scripts": {
+    "predev": "node scripts/generate-search-index.mjs",
     "dev": "next dev",
     "build": "node scripts/keepalive-waline.mjs && node scripts/generate-search-index.mjs && next build && node scripts/prune-out.mjs",
     "build:verify": "node scripts/generate-search-index.mjs && next build && node scripts/prune-out.mjs",

@@ -55,8 +55,8 @@ npx tsc --noEmit     # 类型检查
 npm test             # 单元测试（vitest）
 ```
 
-> **`npm run dev` 下搜索是空的。** 搜索索引 `public/search-index.json` 是构建产物（已 gitignore），
-> `next dev` 不会生成它。想在开发时用搜索，先跑一次 `node scripts/generate-search-index.mjs`。
+> `npm run dev` 会先经 `predev` 生成搜索索引，所以开发模式下搜索可以直接用；
+> 索引本身是构建产物、不入库（见 `.gitignore`）。
 
 ## 改成你自己的
 

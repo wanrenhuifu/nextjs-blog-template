@@ -276,10 +276,8 @@ async function readPostFile(
       return { data, content };
     } catch (error) {
       console.error(
-        `[content] frontmatter 解析失败，该文章已被跳过：${filePath}
-` +
-          `          ${(error as Error).message}
-` +
+        `[content] frontmatter 解析失败，该文章已被跳过：${filePath}\n` +
+          `          ${(error as Error).message}\n` +
           `          常见原因：引号未闭合、缩进有误、值里含未转义的冒号或 #。`,
       );
       return null;

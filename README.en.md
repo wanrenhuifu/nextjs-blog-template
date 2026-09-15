@@ -59,9 +59,8 @@ npx tsc --noEmit     # type check
 npm test             # unit tests (vitest)
 ```
 
-> **Search is empty under `npm run dev`.** The search index (`public/search-index.json`) is a build
-> artifact and is gitignored; `next dev` never generates it. Run
-> `node scripts/generate-search-index.mjs` once if you want search while developing.
+> `npm run dev` runs `predev` first, which generates the search index — so search works
+> during development. The index itself is a build artifact and is not committed.
 
 ## Make it yours
 
