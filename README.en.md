@@ -130,7 +130,7 @@ take precedence and are never overwritten by the file.
 | The "About" page | `app/about/page.tsx` (written as generic wording, fine to leave as-is) |
 | Navigation menu | `components/layout/nav-data.ts` |
 | Site icon | the ink-bamboo geometry in `scripts/generate-icons.mjs` |
-| Copyright holder in the license | line 3 of `LICENSE` (`你的名字`) |
+| Copyright holder in the license | line 3 of `LICENSE` (signed `wanrenhuifu`; replace with your own name or handle) |
 
 ## Environment variables
 
@@ -147,11 +147,14 @@ See [`.env.example`](./.env.example) for the full annotated list.
 
 The repo ships `.github/workflows/deploy.yml`; pushing to `main` builds and publishes.
 
-**Two things must be done before the first deploy**, or nothing will happen / the deploy will fail:
+**Two things must be done before the first deploy**:
 
 1. Actions are **disabled on forks by default** — open the Actions tab and enable them.
    (Without this, a push produces no workflow run and no error message.)
 2. Go to **Settings → Pages** and set **Source** to **"GitHub Actions"**.
+
+Skipping step 2 does not produce a red X: the workflow detects that Pages is not enabled,
+**skips the deploy and prints a notice** telling you what is missing (build and checks still run).
 
 The site URL and basePath are derived automatically — no configuration needed in either case:
 

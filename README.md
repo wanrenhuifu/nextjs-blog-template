@@ -121,7 +121,7 @@ npm run icons  # → public/favicon.svg + apple-touch-icon.png（图标不含文
 | 「关于」页 | `app/about/page.tsx`（文案刻意写成通用描述，不改也能看） |
 | 导航菜单 | `components/layout/nav-data.ts` |
 | 站点图标 | `scripts/generate-icons.mjs` 里的墨竹几何 |
-| 许可协议里的署名 | `LICENSE` 第 3 行的 `你的名字` |
+| 许可协议里的署名 | `LICENSE` 第 3 行（模板署名为 wanrenhuifu，换成你自己的名字或 ID） |
 
 ## 环境变量
 
@@ -138,11 +138,14 @@ npm run icons  # → public/favicon.svg + apple-touch-icon.png（图标不含文
 
 仓库自带 `.github/workflows/deploy.yml`，推送到 `main` 即自动构建并发布。
 
-**首次部署前要做两件事**，否则不会有任何反应或部署失败：
+**首次部署前要做两件事**：
 
 1. fork 出来的仓库默认**不启用 Actions** —— 到 Actions 标签页点一下启用
    （不启用时推送后不会产生任何 workflow 运行，也没有报错提示）
 2. 到 **Settings → Pages**，把 **Source 设为 "GitHub Actions"**
+
+第 2 步没做也不会出红叉：工作流会检测到 Pages 未启用，**跳过部署并打印一条提示**
+告诉你差这一步（构建与检查照常跑完）。
 
 站点地址与 basePath 会**自动推导**，两种情况都无需配置：
 

@@ -22,6 +22,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      # 供 deploy 作业判断是否真的部署（见 Check Pages availability 一步）
+      pages_available: ${{ steps.pages.outputs.available }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -44,6 +47,26 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      # 先探一下 Pages 是否真的启用了，没启用就跳过部署。
+      #
+      # 为什么需要这一步：fork 出来的仓库默认没开 Pages，而本工作流在 push 时就会触发 ——
+      # 于是第一次推送必然得到一个「部署失败」的红叉，但失败原因藏在日志深处
+      # （deploy-pages 报 "Get Pages site failed"），很容易被误读成代码有问题。
+      # 这里改成显式跳过并打印一条 notice，把该做的事直接说清楚：
+      # 构建与检查照常跑（CI 价值保留），只有部署这一步不做。
+      - name: Check Pages availability
+        id: pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh api "repos/${{ github.repository }}/pages" > /dev/null 2>&1; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+            echo "Pages 已启用，继续部署。"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::仓库尚未启用 GitHub Pages，已跳过部署。到 Settings → Pages 把 Source 设为 \"GitHub Actions\" 后重跑本工作流即可。"
+          fi
 
       - name: Lint
         run: npm run lint
@@ -112,11 +135,14 @@ jobs:
         run: npm run build
 
       - name: Upload artifact
+        if: steps.pages.outputs.available == 'true'
         uses: actions/upload-pages-artifact@v5
         with:
           path: ./out
 
   deploy:
+    # 未启用 Pages 时整个部署作业跳过 —— 否则会以一个看不懂的错误收场
+    if: needs.build.outputs.pages_available == 'true'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
