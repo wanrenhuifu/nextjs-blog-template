@@ -25,7 +25,7 @@
 | 三种聚合视图 | 按标签、按类型、按年份归档 | — |
 | SEO | RSS、sitemap、robots、Open Graph、JSON-LD 结构化数据 | 建议填站点地址 |
 | 分享图 / 图标 | 脚本生成 OG 图与图标，改站名后重跑即可换品牌 | — |
-| 工坊 | 随机数生成、Base64 编解码、ADHD 自测、工作性价比计算器（纯前端，不上传数据） | — |
+| 工坊 | 一个示例工具（随机数生成器），纯前端、不上传数据；按同一形状可自行添加 | — |
 | 评论 | Waline，自建后端 | 需自建 |
 | 友链 | 卡片列表 + 申请说明 | — |
 | 小彩蛋 | 右下角竹苗随访问次数成长；切走标签页时标题变化 | — |
@@ -255,7 +255,7 @@ components/             # React 组件（按功能域分组）
 ├── blog/               # PostCard / PostCardSkeleton / MdxContent
 │                       #   TableOfContents / WalineComments
 ├── home/               # HeroSection（构图与时序）/ HeroScenery（场景绘制）
-├── tools/              # RandomNumber / Base64Tool / ADHDTest / WorkValueCalculator
+├── tools/              # RandomNumber（模板自带的示例工具）
 └── ui/                 # FadeUp / GlowCard / BambooSprout / CopyCodeButton
                         #   BackToTop / ScrollProgress
 

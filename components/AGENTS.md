@@ -12,7 +12,7 @@
 | `blog/` | 博客阅读相关组件 | `PostCard`, `PostCardSkeleton`, `MdxContent`, `TableOfContents`, `WalineComments` |
 | `home/` | 首页专属组件 | `HeroSection`（构图与时序）、`HeroScenery`（场景绘制：竹、远山、星河、月轮、云气、光柱、萤火、落叶） |
 | `layout/` | 全局布局与导航 | `Header`, `Footer`, `PageShell`, `DesktopNav`, `MobileDrawer`, `SearchModal`, `ThemeToggle`, `TimeThemeController`, `BackLink`, `GlobalUI`, `PageTitle`, `ErrorFallback`, `FarewellTitle` |
-| `tools/` | 工具页面交互组件 | `RandomNumber`, `Base64Tool`, `ADHDTest`, `WorkValueCalculator` |
+| `tools/` | 工具页面交互组件 | `RandomNumber`（模板自带的示例，其余工具按同一形状添加） |
 | `ui/` | 通用 UI 原子组件 | `FadeUp`, `GlowCard`, `BambooSprout`, `CopyCodeButton`, `BackToTop`, `ScrollProgress` |
 
 ## 编码规范

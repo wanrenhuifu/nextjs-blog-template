@@ -43,8 +43,16 @@ function ToolCard({ tool }: { tool: ToolItem }) {
   );
 }
 
-/** 栏目区块：统一的标题样式 + 卡片网格 */
+/**
+ * 栏目区块：统一的标题样式 + 卡片网格。
+ *
+ * **空分组直接不渲染** —— 否则删掉某个分类里的最后一条工具后，页面上会留下一个
+ * 光秃秃的标题（「更多工具」下面什么都没有）。空判断放在这里而不是各个调用点，
+ * 是为了让人加新分类时不可能忘掉。
+ */
 function ToolSection({ title, items }: { title: string; items: ToolItem[] }) {
+  if (items.length === 0) return null;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
@@ -82,19 +90,15 @@ export function ToolsPageClient() {
               </div>
             </div>
             <p className="text-muted max-w-2xl">
-              无需安装、即开即用的本地小工具，以及我维护的开源项目
+              无需安装、即开即用的本地小工具，全部在浏览器里跑，不上传任何数据
             </p>
           </div>
 
           <div className="space-y-12">
-            {/* Quick Tools */}
+            {/* 三个分组都交给 ToolSection 自己判断空 —— 某一类没有任何条目时整块消失 */}
             <ToolSection title="即开即用" items={quickTools} />
-
-            {/* More Tools */}
             <ToolSection title="更多工具" items={moreTools} />
-
-            {/* Projects */}
-            {projects.length > 0 && <ToolSection title="项目" items={projects} />}
+            <ToolSection title="项目" items={projects} />
           </div>
         </div>
       </section>

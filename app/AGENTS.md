@@ -23,9 +23,6 @@
 | `app/tools/page.tsx` | 工坊工具列表页 |
 | `app/tools/ToolsPageClient.tsx` | 工坊列表（Client Component，与路由同目录就地放置）。按 quick / more / projects 分组渲染，**没有筛选交互** |
 | `app/tools/random-number/page.tsx` | 随机数生成器 |
-| `app/tools/base64/page.tsx` | Base64 编解码工具 |
-| `app/tools/adhd/page.tsx` | ADHD 自测工具页 |
-| `app/tools/work-value/page.tsx` | 工作性价比计算器 |
 | `app/rss.xml/route.ts` | RSS Feed 路由 |
 | `app/robots.ts` | robots.txt 站点地图入口 |
 | `app/sitemap.ts` | 站点地图 |
@@ -44,9 +41,6 @@
 | `app/types/error.tsx` | 类型聚合页错误边界 |
 | `app/tools/error.tsx` | 工具列表页错误边界 |
 | `app/tools/random-number/error.tsx` | 随机数工具错误边界 |
-| `app/tools/base64/error.tsx` | Base64 工具错误边界 |
-| `app/tools/adhd/error.tsx` | ADHD 自测错误边界 |
-| `app/tools/work-value/error.tsx` | 工作性价比计算错误边界 |
 | `app/blog/loading.tsx` | 文章列表页加载骨架 |
 | `app/blog/[slug]/loading.tsx` | 文章详情页加载骨架 |
 | `app/tags/loading.tsx` | 标签云页加载骨架 |
@@ -56,9 +50,6 @@
 | `app/types/loading.tsx` | 类型聚合页加载骨架 |
 | `app/tools/loading.tsx` | 工具列表页加载骨架 |
 | `app/tools/random-number/loading.tsx` | 随机数工具加载骨架 |
-| `app/tools/base64/loading.tsx` | Base64 工具加载骨架 |
-| `app/tools/adhd/loading.tsx` | ADHD 自测加载骨架 |
-| `app/tools/work-value/loading.tsx` | 工作性价比计算加载骨架 |
 
 ## 编码规范
 

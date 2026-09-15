@@ -35,9 +35,6 @@ const ROUTES = [
   { key: "guestbook", url: "/guestbook/" },
   { key: "tools", url: "/tools/" },
   { key: "tool-random", url: "/tools/random-number/" },
-  { key: "tool-base64", url: "/tools/base64/" },
-  { key: "tool-adhd", url: "/tools/adhd/" },
-  { key: "tool-workvalue", url: "/tools/work-value/" },
   { key: "notfound", url: "/definitely-not-a-real-page/" },
 ];
 

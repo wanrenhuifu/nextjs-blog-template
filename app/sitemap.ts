@@ -18,10 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/guestbook/`, lastModified: new Date() },
     { url: `${baseUrl}/tags/`, lastModified: new Date() },
     { url: `${baseUrl}/tools/`, lastModified: new Date() },
-    { url: `${baseUrl}/tools/adhd/`, lastModified: new Date() },
-    { url: `${baseUrl}/tools/base64/`, lastModified: new Date() },
     { url: `${baseUrl}/tools/random-number/`, lastModified: new Date() },
-    { url: `${baseUrl}/tools/work-value/`, lastModified: new Date() },
     { url: `${baseUrl}/types/`, lastModified: new Date() },
   ];
 

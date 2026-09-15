@@ -29,7 +29,7 @@ plus a small tool shed. **It builds out of the box** — no environment variable
 | Three index views | By tag, by category, by year | — |
 | SEO | RSS, sitemap, robots, Open Graph, JSON-LD | Set your site URL |
 | Share image / icons | Script-generated OG image and icons; re-run to rebrand | — |
-| Tool shed | Random numbers, Base64, an ADHD self-screen, a work-value calculator (all client-side) | — |
+| Tool shed | One example tool (random numbers), fully client-side; add your own in the same shape | — |
 | Comments | Waline, self-hosted backend | Self-host Waline |
 | Friends | Link cards + application notes | — |
 | Small easter eggs | A bamboo sprout that grows with visit count; the tab title changes when you leave | — |
@@ -266,7 +266,7 @@ components/             # React components, grouped by domain
 ├── blog/               # PostCard / PostCardSkeleton / MdxContent
 │                       #   TableOfContents / WalineComments
 ├── home/               # HeroSection (composition & timing) / HeroScenery (scene drawing)
-├── tools/              # RandomNumber / Base64Tool / ADHDTest / WorkValueCalculator
+├── tools/              # RandomNumber (the example tool shipped with the template)
 └── ui/                 # FadeUp / GlowCard / BambooSprout / CopyCodeButton
                         #   BackToTop / ScrollProgress
 

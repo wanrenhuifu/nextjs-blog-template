@@ -1,6 +1,28 @@
-import { Shuffle, Lightbulb, DollarSign, Code } from "lucide-react";
+import { Shuffle } from "lucide-react";
 import type { ToolItem } from "./types";
 
+/**
+ * 工坊的工具清单。
+ *
+ * 模板只带一个**通用**工具（随机数生成器）作为示例与占位 —— 它演示了这个栏目
+ * 需要什么：一条配置、一个纯前端组件、一份路由。你自己的工具照下面这个形状加即可：
+ *
+ * ```ts
+ * {
+ *   href: "/tools/<你的路由>",
+ *   name: "工具名",
+ *   desc: "一句话说明它做什么",
+ *   icon: SomeIcon,        // 从 "lucide-react" 引入
+ *   color: "from-info/10 to-info/[0.02]",        // 卡片渐变底
+ *   iconColor: "text-info",                       // 图标色
+ *   borderColor: "border-info/20",                // 悬停边框
+ *   category: "quick",     // quick = 快捷工具区 / more = 更多工具区
+ * }
+ * ```
+ *
+ * 可用的配色 token：`primary` / `info` / `success` / `warning` / `accent-2` / `accent-3`，
+ * 三者（color / iconColor / borderColor）取同一组，视觉上才是一套。
+ */
 export const tools: ToolItem[] = [
   {
     href: "/tools/random-number",
@@ -12,38 +34,8 @@ export const tools: ToolItem[] = [
     borderColor: "border-primary/20",
     category: "quick",
   },
-  {
-    href: "/tools/base64",
-    name: "Base64 编解码",
-    desc: "支持中文的文本与 Base64 双向转换",
-    icon: Code,
-    color: "from-info/10 to-info/[0.02]",
-    iconColor: "text-info",
-    borderColor: "border-info/20",
-    category: "quick",
-  },
-  {
-    href: "/tools/adhd",
-    name: "ADHD 自测",
-    desc: "基于 ASRS-5 标准的成人 ADHD 筛查量表，6 道问题快速自评",
-    icon: Lightbulb,
-    color: "from-warning/10 to-warning/[0.02]",
-    iconColor: "text-warning",
-    borderColor: "border-warning/20",
-    category: "more",
-  },
-  {
-    href: "/tools/work-value",
-    name: "工作性价比计算器",
-    desc: "用公式量化这份工作到底值不值，薪资、时间、环境综合评估",
-    icon: DollarSign,
-    color: "from-success/10 to-success/[0.02]",
-    iconColor: "text-success",
-    borderColor: "border-success/20",
-    category: "more",
-  },
   // ── 项目（category: "projects"）────────────────────────────────────────
-  // 这里是收录**外部开源项目**的入口，指向站外链接（`external: true` 时会渲染成
+  // 这是收录**外部开源项目**的入口，指向站外链接（`external: true` 时渲染成
   // 新窗口打开的 <a>，而不是内部路由 <Link>）。
   //
   // 模板默认留空 —— 该栏目标题在数组里没有 projects 条目时不会渲染（见
