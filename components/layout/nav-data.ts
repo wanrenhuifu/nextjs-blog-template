@@ -13,14 +13,13 @@ export const navItems: NavItem[] = [
     ],
   },
   { href: "/tools", label: "工坊" },
-  { href: "/radar", label: "雷达" },
   {
     href: "/about",
     label: "关于",
     children: [
       { href: "/guestbook", label: "留言" },
       { href: "/friends", label: "友链" },
-      { href: "/about", label: "个人简介" },
+      { href: "/about", label: "关于本站" },
     ],
   },
 ];

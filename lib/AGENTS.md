@@ -9,7 +9,7 @@
 
 | 文件 | 用途 |
 |------|------|
-| `constants.ts` | 全局共享常量（`VISIBLE_LMARENA_SLUGS` 排行榜展示分类、`POST_CATEGORIES` 文章类型枚举、`CATEGORY_UI` 类型展示配置：图标/描述/配色） |
+| `constants.ts` | 全局共享常量（`POST_CATEGORIES` 文章类型枚举、`CATEGORY_UI` 类型展示配置：图标/描述/配色） |
 | `types.ts` | 全局 TypeScript 类型/接口定义 (`Post`, `TocItem`, `Friend`) |
 | `content.ts` | 博客内容核心 API：读取 `content/blog/` 目录、解析 frontmatter、计算阅读时间、提取目录、标签聚合、类型分组（`getPostsGroupedByCategory`）、相邻文章。另导出 `collectImageSizes`（构建期用 sharp 读正文图片原始尺寸）、`enhanceRawImages`（给手写 `<img>` 补懒加载与宽高）与 `extractToc`（目录提取，按 `/[
 ?
@@ -19,7 +19,7 @@
 | `a11y.ts` | 无障碍工具函数（`prefersReducedMotion()` 媒体查询检测、平滑滚动至目标元素） |
 | `mdx.ts` | MDX 编译配置（remark/rehype 插件组合） |
 | `readingTime.ts` | 中文/英文混合阅读时间估算 |
-| `schemas.ts` | Zod 数据校验 Schema（frontmatter、友链、雷达数据等） |
+| `schemas.ts` | Zod 数据校验 Schema（frontmatter、友链等） |
 | `tools.ts` | 工具页面配置数据（`ToolItem[]` 数组） |
 | `timeTheme.ts` | 按本地时间自动切换日/夜主题的纯工具：边界常量（06:00/18:00）、`themeForDate` / `msUntilNextBoundary`、`buildTimeThemeScript`（注入 layout 的预绘种子脚本）、`theme-mode` 锁定标记常量（缺席=自动，`"pinned"`=手动锁定） |
 | `bamboo.ts` | 竹苗彩蛋纯逻辑：`BAMBOO_STAGES` 阶段表（竹笋/幼苗/小节竹/青竹/开花竹）与 `getBambooStageIndex` 阈值计算、存储键名常量，消费方为 `components/ui/BambooSprout.tsx` |
@@ -40,7 +40,10 @@
    - 单篇文章内重复标签自动去重后计数。
    - 按标签筛选文章时大小写不敏感（如 `JavaScript` 与 `javascript` 视为同一标签）。
    - Schema 层面禁止空字符串标签（`z.string().min(1)`）。
-9. **按行切分内容时必须兼容 CRLF** —— 本项目 `core.autocrlf=true` 且没有 `.gitattributes`，Windows 上任何一次重新检出都会把 `content/` 下的文章转成 CRLF。而 JS 的 `.` 不匹配行终止符、`` 正是行终止符，所以 `/^(#{1,6})\s+(.+)$/` 这类正则一旦遇到残留的结尾 `` 就会整体失配。真实后果：**文章的目录会静默变空**（正文照常渲染，只有目录消失，极难察觉）。凡按行处理内容，一律用 `split(/?
+9. **按行切分内容时必须兼容 CRLF** —— 本项目 `core.autocrlf=true` 且没有 `.gitattributes`，Windows 上任何一次重新检出都会把 `content/` 下的文章转成 CRLF。而 JS 的 `.` 不匹配行终止符、`
+` 正是行终止符，所以 `/^(#{1,6})\s+(.+)$/` 这类正则一旦遇到残留的结尾 `
+` 就会整体失配。真实后果：**文章的目录会静默变空**（正文照常渲染，只有目录消失，极难察觉）。凡按行处理内容，一律用 `split(/
+?
 /)`。`lib/content.test.ts` 有对应的 CRLF 回归护栏。
 10. **正文图片（两条路径，别只改一条）** —— 文章内图片的懒加载与尺寸预留分两处实现，因为 MDX 对待两类图片的方式不同：
    - **Markdown 语法 `![]()`** 生成的 `<img>` 会经过 `components` 映射表 → 由 `components/blog/MdxContent.tsx` 的 `Image` 覆盖处理。注意 MDX 会对 `src` 做 URL 编码（中文文件名变 `%xx`），查尺寸表时要同时试原文与解码两种形态。

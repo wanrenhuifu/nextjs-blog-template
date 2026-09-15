@@ -3,13 +3,13 @@
 
 ## 目录用途
 
-构建时与定时任务脚本，使用 Node.js ESM (`.mjs`) 编写。其中构建步骤在 `package.json` 的 `scripts.build` 中链式调用。
+构建时与手动运维脚本，使用 Node.js ESM (`.mjs`) 编写。构建步骤在 `package.json` 的 `scripts.build` 中链式调用。
 
-目录分两层，刻意分开是因为**性质不同**：根下的脚本会被 CI 执行（改动会影响部署），`audit/` 下的只在本地按需手动运行。
+目录分两层，刻意分开是因为**性质不同**：根下的脚本可能被 `npm run build` 或 CI 执行（改动会影响部署），`audit/` 下的只在本地按需手动运行。
 
 ```
 scripts/
-├── *.mjs       构建链 + 手动资源生成器（CI 会跑）
+├── *.mjs       构建链 + 手动资源生成器
 └── audit/      开发期校验工具（只手动跑，不参与构建）
 ```
 
@@ -18,12 +18,13 @@ scripts/
 | 文件 | 触发时机 | 用途 |
 |------|----------|------|
 | `generate-search-index.mjs` | `npm run build` | 扫描 `content/blog/` 生成 `public/search-index.json` 搜索索引 |
-| `generate-og.mjs` | 手动 | 使用 Sharp 生成 `public/og-default.png` OpenGraph 默认图片 |
-| `generate-icons.mjs` | 手动 | 生成 `public/favicon.svg` 与 `public/apple-touch-icon.png`。**两个图标由同一份墨竹几何定义派生**——它们曾经各自手工维护而变得不一致（favicon 是竹林、apple 是「万」字），合并到一处后结构上不可能再漂移 |
-| `fetch-avatars.mjs` | 手动/定时 | 根据 `data/friends.json` 中的 GitHub 用户名抓取头像到 `public/friends/avatars/` |
-| `fetch-lmarena.mjs` | `npm run build` | 抓取 arena.ai 排行榜数据写入 `data/radar/lmarena.json`，含超时与缓存回退 |
-| `fetch-weather-alerts.mjs` | `npm run build` | 抓取天气预警数据写入 `data/radar/weather-alerts.json` |
-| `keepalive-waline.mjs` | `npm run build` | ping Waline 评论后端保活 Supabase 免费层数据库（防 7 天无活动自动暂停），永不阻断构建 |
+| `keepalive-waline.mjs` | `npm run build` | ping Waline 评论后端保活 Supabase 免费层数据库（防 7 天无活动自动暂停）。**永不阻断构建** |
+| `generate-og.mjs` | 手动 | 使用 Sharp 生成 `public/og-default.png` 分享图。站名与域名是**烧进像素**的，改 `site.config.mjs` 后必须重跑 |
+| `generate-icons.mjs` | 手动 | 生成 `public/favicon.svg` 与 `public/apple-touch-icon.png`。**两个图标由同一份墨竹几何定义派生**——它们曾经各自手工维护而变得不一致（一个竹林小图、一个单个汉字），合并到一处后结构上不可能再漂移。图标不含站名，fork 后通常不必重跑 |
+| `fetch-avatars.mjs` | 手动 | 根据 `data/friends.json` 中的 GitHub 用户名抓取头像到 `public/friends/avatars/` |
+
+> 除 `generate-search-index.mjs` 与 `keepalive-waline.mjs` 外，其余都是**手动按需运行**，
+> 不会被 CI 触发（CI 只跑 `npm run build` 及其中的链式步骤）。
 
 ## 文件说明（scripts/audit/）
 
@@ -33,16 +34,21 @@ scripts/
 |------|------|
 | `screenshot.mjs` | 视觉审计：遍历全部路由 × 日/夜主题 × 桌面/移动视口截图到 `verify-shots/`。支持按路由筛选、`--theme=`、`--motion=full`、`--no-fonts` |
 | `perf-audit.mjs` | 性能测量：FCP / LCP / CLS + 分类型传输量，正常网速与 Slow 4G 两档。自带 gzip 静态服务器跑 `out/`（**不要用 `next dev` 测，数字没有参考价值**）。`--no-fonts` 可拦截字体做对照 |
-| `perf-assets.mjs` | 单页资源清单：按体积排序列出某页全部资源，并报出 LCP 元素是谁。<路径> 为必填参数 |
+| `perf-assets.mjs` | 单页资源清单：按体积排序列出某页全部资源，并报出 LCP 元素是谁。路径参数可省略，默认 `/` |
+
+> 这三个脚本的路由表与默认目标路径是为演示内容写的 —— 删改文章后请同步
+> `screenshot.mjs` 顶部的 `ROUTES` 与 `perf-audit.mjs` 的默认路径。
 
 ## 编码规范
 
 1. **ESM 语法** —— 使用 `.mjs` 扩展名、`import`/`export`、`import.meta.url` 获取当前路径。
 2. **路径处理** —— 使用 `path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "...")` 定位项目文件，禁止假设 `process.cwd()`。
-3. **错误处理** —— 网络请求/文件读取失败时打印清晰错误；`fetch-lmarena.mjs` 在抓取失败时回退到本地缓存（不阻断构建），其他脚本仍使用 `process.exit(1)`。
-4. **输出格式** —— JSON 数据文件使用 `JSON.stringify(data, null, 2)` 格式化输出，便于 diff 与人工审阅。
-5. **不污染源码** —— 脚本写入的数据文件（如 `data/radar/*.json`、`public/search-index.json`）应被 `.gitignore` 忽略或作为构建产物提交；若提交，需在 README 中说明更新频率。
-6. **API 密钥** —— 若脚本需要外部 API Key，通过环境变量读取，**禁止硬编码密钥**。
+3. **错误处理分两类** ——
+   - **构建链上的脚本一律不得阻断构建**（缺配置、网络失败、后端不可达都只打印警告并退出 0），因为 fork 后的首次构建必须能跑通；
+   - 若脚本的输入缺失会让后续步骤产出**错误结果**（如 `generate-search-index.mjs` 找不到 `content/blog/` 目录），则应当大声失败并 `process.exit(1)`，不要静默产出一个空索引。
+4. **环境变量** —— 通过环境变量读取密钥，**禁止硬编码**。注意本目录的脚本**不会**自动加载 `.env.local`（只有 Next CLI 会），需要使用真实的进程环境变量。
+5. **输出格式** —— JSON 数据文件使用 `JSON.stringify(data, null, 2)` 格式化输出，便于 diff 与人工审阅。
+6. **不污染源码** —— 脚本写入的产物（如 `public/search-index.json`）应加进 `.gitignore` 由构建重新生成；若确实要提交（如抓取数据的缓存），需在 README 中说明更新频率。
 
 ## 添加新脚本流程
 

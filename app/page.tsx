@@ -35,7 +35,6 @@ const INDEX_LIMIT = 8;
 const ENTRIES = [
   { href: "/blog", label: "文章" },
   { href: "/tools", label: "工坊" },
-  { href: "/radar", label: "雷达" },
   { href: "/about", label: "关于" },
 ];
 
@@ -117,7 +116,7 @@ export default async function Home() {
               ))}
             </ul>
 
-            {/* 纯文字入口：补回被删掉的工坊/雷达导航入口 */}
+            {/* 底部纯文字入口：不在导航菜单里重复的那些页面 */}
             <nav
               className="mt-14 flex flex-wrap items-center gap-x-8 gap-y-3"
               aria-label="站点导航"

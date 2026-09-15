@@ -7,17 +7,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | 命令 | 说明 |
 |------|------|
 | `npm run dev` | 启动开发服务器 |
-| `npm run build` | 完整发布路由：`fetch-lmarena → fetch-weather-alerts → keepalive-waline → generate-search-index → next build`，静态输出至 `out/`。抓取步骤**缺配置时自行跳过，不阻断构建**，因此本地无密钥也能跑通 |
-| `npm run build:verify` | 构建验证路由：`generate-search-index → next build`，跳过全部抓取。本地验证编译用，比完整 `build` 快 |
+| `npm run build` | 完整发布路由：`keepalive-waline → generate-search-index → next build`，静态输出至 `out/`。链上步骤**缺配置时自行跳过，不阻断构建**，因此本地无密钥也能跑通 |
+| `npm run build:verify` | 构建验证路由：`generate-search-index → next build`，跳过 Waline 保活。本地验证编译用，比完整 `build` 快 |
 | `npm run lint` | ESLint 9 扁平配置（`eslint-config-next` core-web-vitals + TS） |
 | `npx tsc --noEmit` | 类型检查（未注册 npm script） |
 | `npm test` | 运行测试（`vitest run`，单次执行），测试文件如 `lib/content.test.ts`，配置见 `vitest.config.ts` |
 | `npm run test:watch` | 以 watch 模式运行 vitest |
-| `npm start` | 启动 Next.js 生产服务器 |
+| `npm start` | 本地预览构建产物（`npx serve out`）。**不能用 `next start`** —— 静态导出（`output: "export"`）下该命令会直接报错 |
 
 - **测试** —— 单元测试走 vitest（`npm test` / `npm run test:watch`）。`playwright-chromium` 已被 `scripts/audit/` 下的视觉与性能校验脚本使用（逐页截图、FCP/LCP 测量），但**没有接入任何 E2E 测试框架**，不要假设存在端到端测试。
 - 单独运行脚本：`node scripts/<name>.mjs`（如 `node scripts/generate-search-index.mjs`）。
-- **构建链上的抓取步骤永不阻断构建** —— 这是刻意设计，因为 fork 后首次构建必须能跑通。`fetch-weather-alerts.mjs` 缺 `QWEATHER_KEY`/`QWEATHER_HOST` 时打印提示并退出 0（保留已有 JSON）；`fetch-lmarena.mjs` 抓取失败回退本地缓存；`keepalive-waline.mjs` 缺 URL 时静默跳过。CI 中由 GitHub Actions secrets 注入这些值。
+- **构建链上的步骤永不阻断构建** —— 这是刻意设计，因为 fork 后首次构建必须能跑通。`keepalive-waline.mjs` 缺 `NEXT_PUBLIC_WALINE_SERVER_URL` 时静默跳过，后端不可达也只打印警告。CI 中由 GitHub Actions secrets 注入。
+- **`.mjs` 脚本读不到 `.env.local`** —— 只有 Next CLI 会加载它。构建时要让保活生效需传入真实环境变量（`NEXT_PUBLIC_WALINE_SERVER_URL=... npm run build`），`npm run og` / `npm run avatars` 同理。
 - **`next build` 与 `next dev` 共用 `.next` 目录，不要同时跑。** 在 dev server 运行期间执行 `npm run build:verify` 会覆盖 dev 的增量编译状态，此后**部分路由会永久挂起、不再响应**（实测 `/tools/random-number/` 卡死 90s 无响应，首页却正常，极易误判成代码 bug）。遇到这种症状先停掉 dev、`rm -rf .next`、再重启即可恢复。
 
 ## 架构总览：三条数据管线
@@ -25,14 +26,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 站点为纯静态导出（`output: "export"`），所有数据在构建时凝固，运行时零后端。理解这三条管线即可理解全站：
 
 1. **博客内容**：`content/blog/<slug>/index.mdx` → `lib/content.ts`（gray-matter 解析 frontmatter、Zod 校验、阅读时间/目录/标签聚合）→ 各 `page.tsx` 在构建时通过 `generateStaticParams` 枚举生成 → `lib/mdx.ts` 的插件链（remark-gfm → remarkMath → rehypeSlug → rehypePrettyCode → rehypeKatex）编译 MDX。搜索走旁路：`scripts/generate-search-index.mjs` 产出 `public/search-index.json`，由客户端 `SearchModal` fetch 加载。
-2. **结构化数据**：`scripts/*.mjs` 抓取（构建时链式执行）→ 写入 `data/*.json` → `lib/data.ts` 统一读取（Zod `safeParse` + 失败降级 fallback，保证数据异常不白屏）→ radar / friends 页面。**抓取与读取两端的失败都是降级而非中断**：抓取脚本缺配置/失败时跳过或回退缓存，`lib/data.ts` 读不到文件时返回空数据兜底（会打印 `[data] ... 数据读取失败` 日志，构建仍然成功）。
+2. **结构化数据**：`data/*.json`（人工维护）→ `lib/data.ts` 统一读取（Zod 校验 + 失败降级 fallback，保证数据异常不白屏）→ 友链页。读取失败是**降级而非中断**：返回空数组兜底并打印 `[data] ... 数据读取失败` 日志，构建仍然成功。
 3. **Client / Server 分界**：数据获取、fs 读取、metadata 全在 Server Component；交互、动画、主题切换（next-themes）、评论（Waline）、搜索在 Client Component。
 
 **部署**：GitHub Pages（`.github/workflows/deploy.yml`）——push 到 `main` 自动部署。站点地址与 basePath 由工作流按「用户站点 / 项目页」自动推导，无需配置。`trailingSlash: true` 是为 GH Pages 目录级 URL 设置的，不要移除。
 
-构建期可注入的 secret 有 `QWEATHER_KEY`、`QWEATHER_HOST`、`NEXT_PUBLIC_WALINE_SERVER_URL`，均为可选。
+构建期可注入的 secret 只有 `NEXT_PUBLIC_WALINE_SERVER_URL`（可选，用于评论）。注意 `deploy.yml` 里读取的 secret 名是 `WALINE_SERVER_URL`，它被赋给环境变量 `NEXT_PUBLIC_WALINE_SERVER_URL` —— 在仓库 Secrets 里要按 **`WALINE_SERVER_URL`** 这个名字创建。
 
-> `deploy.yml` 里原本有 `cron: '0 0,12 * * *'`（每 12 小时重新抓取雷达数据并重建）。模板化时**默认注释掉了**：fork 后它会占用你的 Actions 额度，且未配天气 Key 时只是白白重建。需要时取消注释即可。
+> `deploy.yml` 里的 `cron: '0 0,12 * * *'` 是**默认注释掉的**：模板本身已无需要定时刷新的数据，且它会占用你的 Actions 额度。若你之后加了抓取类脚本，取消注释即可（每 12 小时重建一次）。
 
 ## 核心前提
 
@@ -54,7 +55,7 @@ API、约定和文件结构与训练数据中的常规 Next.js 项目可能不�
 | 图标 | Lucide React |
 | 评论 | Waline (`@waline/client`) |
 | 构建脚本 | Node.js ESM (.mjs) |
-| 数据层 | `lib/data.ts` 统一封装 JSON 读取 |
+| 数据层 | `lib/data.ts` 统一封装 JSON 读取（Zod 校验 + 降级兜底） |
 
 ## 通用代码规范
 
@@ -67,7 +68,7 @@ API、约定和文件结构与训练数据中的常规 Next.js 项目可能不�
 7. **静态导出约束** —— 所有路由必须是 SSG 友好，不使用 `headers()`/`cookies()` 等动态 API；图片使用 `unoptimized: true`。
 8. **数据层统一** —— JSON 数据读取必须通过 `lib/data.ts`，禁止在 page 组件中直接 `fs.readFile`。新增数据源时优先扩展 `lib/data.ts`。
 9. **类型集中管理** —— 全局接口定义在 `lib/types.ts`，禁止在多文件中重复定义同一类型。
-10. **组件职责单一** —— Header 已拆分为 `DesktopNav` / `MobileDrawer` / `Header` 外壳。新增布局组件时遵循相同粒度。布局组件（`components/layout/`）只负责布局，业务组件按领域分目录（`blog/`, `tools/`, `radar/`）。
+10. **组件职责单一** —— Header 已拆分为 `DesktopNav` / `MobileDrawer` / `Header` 外壳。新增布局组件时遵循相同粒度。布局组件（`components/layout/`）只负责布局，业务组件按领域分目录（`blog/`, `tools/` 等）。
 11. **禁止 dead code** —— 组件不应保留无调用方的 prop 分支（如已删除的 `standalone` 模式）。清理组件时同步删除对应的 CSS 样式。
 12. **代码与文档同步** —— 每次修改代码后必须检查并同步对应的文档：
     - 新增/删除页面路由或 loading/error 边界 → 更新 `app/AGENTS.md` 路由映射表

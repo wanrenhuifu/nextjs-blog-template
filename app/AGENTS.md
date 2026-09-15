@@ -26,11 +26,6 @@
 | `app/tools/base64/page.tsx` | Base64 编解码工具 |
 | `app/tools/adhd/page.tsx` | ADHD 自测工具页 |
 | `app/tools/work-value/page.tsx` | 工作性价比计算器 |
-| `app/radar/page.tsx` | 雷达数据页 (LLM 排行 + 天气预警) |
-| `app/radar/lmarena/page.tsx` | LMArena 大模型排行榜 |
-| `app/radar/lmarena/LmArenaClient.tsx` | 排行榜的标签页与图表交互（Client Component，与路由同目录就地放置） |
-| `app/radar/lmarena/error.tsx` | 排行榜页错误边界 |
-| `app/radar/weather/page.tsx` | 全国天气预警 |
 | `app/rss.xml/route.ts` | RSS Feed 路由 |
 | `app/robots.ts` | robots.txt 站点地图入口 |
 | `app/sitemap.ts` | 站点地图 |
@@ -45,8 +40,6 @@
 | `app/friends/error.tsx` | 友链页错误边界 |
 | `app/guestbook/error.tsx` | 留言错误边界 |
 | `app/about/error.tsx` | 个人简介页错误边界 |
-| `app/radar/error.tsx` | 雷达列表页错误边界 |
-| `app/radar/weather/error.tsx` | 天气预警页错误边界 |
 | `app/tags/error.tsx` | 标签页错误边界 |
 | `app/types/error.tsx` | 类型聚合页错误边界 |
 | `app/tools/error.tsx` | 工具列表页错误边界 |
@@ -61,9 +54,6 @@
 | `app/friends/loading.tsx` | 友链页加载骨架 |
 | `app/about/loading.tsx` | 个人简介页加载骨架 |
 | `app/types/loading.tsx` | 类型聚合页加载骨架 |
-| `app/radar/loading.tsx` | 雷达列表页加载骨架 |
-| `app/radar/lmarena/loading.tsx` | 排行榜页加载骨架 |
-| `app/radar/weather/loading.tsx` | 天气预警页加载骨架 |
 | `app/tools/loading.tsx` | 工具列表页加载骨架 |
 | `app/tools/random-number/loading.tsx` | 随机数工具加载骨架 |
 | `app/tools/base64/loading.tsx` | Base64 工具加载骨架 |

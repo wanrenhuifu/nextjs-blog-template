@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v5
         with:
-          # Next 16 要求 Node >= 20.9（见 package.json 的 engines）
+          # Node >= 20.19（见 package.json 的 engines）：Next 16 与 vitest 的依赖都要求它
           node-version: "20"
           cache: "npm"
 

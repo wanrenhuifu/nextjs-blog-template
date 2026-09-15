@@ -4,9 +4,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  # 定时重建：用于刷新 /radar 下的抓取数据（AI 模型排行、天气预警）。
-  # 默认关闭 —— fork 后它会按你的仓库计费额度跑，且若没配 QWEATHER_KEY
-  # 只是白白重建。想启用就取消下面两行的注释（每 12 小时一次）。
+  # 定时重建：默认关闭。
+  # 模板本身没有需要定时刷新的数据，但如果你之后加了抓取类脚本，
+  # 可以取消下面两行的注释让站点每 12 小时重建一次 —— 注意它会占用 Actions 额度。
   # schedule:
   #   - cron: '0 0,12 * * *'
 
@@ -29,7 +29,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v5
         with:
-          # Next 16 要求 Node >= 20.9（见 package.json 的 engines）
+          # Node >= 20.19（见 package.json 的 engines）：Next 16 与 vitest 的依赖都要求它
           node-version: "20"
           cache: "npm"
 
@@ -85,8 +85,6 @@ jobs:
           NEXT_PUBLIC_SITE_URL: ${{ steps.site.outputs.url }}
           NEXT_PUBLIC_BASE_PATH: ${{ steps.site.outputs.base_path }}
           NEXT_PUBLIC_WALINE_SERVER_URL: ${{ secrets.WALINE_SERVER_URL }}
-          QWEATHER_KEY: ${{ secrets.QWEATHER_KEY }}
-          QWEATHER_HOST: ${{ secrets.QWEATHER_HOST }}
         run: npm run build
 
       - name: Upload artifact

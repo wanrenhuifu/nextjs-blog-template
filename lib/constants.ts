@@ -8,16 +8,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-/** 排行榜展示分类（按此顺序），不在列表中的分类会被过滤 */
-export const VISIBLE_LMARENA_SLUGS = [
-  "text",
-  "agent",
-  "code/webdev",
-  "text/coding",
-  "text-to-image",
-  "text-to-video",
-];
-
 /** 文章类型（category）枚举，同时也是 /types 页的展示顺序 */
 export const POST_CATEGORIES = [
   "技术",

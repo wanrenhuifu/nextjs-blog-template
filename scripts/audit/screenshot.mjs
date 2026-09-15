@@ -38,9 +38,6 @@ const ROUTES = [
   { key: "tool-base64", url: "/tools/base64/" },
   { key: "tool-adhd", url: "/tools/adhd/" },
   { key: "tool-workvalue", url: "/tools/work-value/" },
-  { key: "radar", url: "/radar/" },
-  { key: "radar-lmarena", url: "/radar/lmarena/" },
-  { key: "radar-weather", url: "/radar/weather/" },
   { key: "notfound", url: "/definitely-not-a-real-page/" },
 ];
 

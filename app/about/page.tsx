@@ -5,7 +5,6 @@ import {
   ExternalLink,
   HeartHandshake,
   MessageSquare,
-  Radar,
   Rss,
   Wrench,
 } from "lucide-react";
@@ -37,12 +36,6 @@ const SITE_MODULES = [
     icon: Wrench,
     name: "工坊",
     desc: "手搓的小工具合集，打开即用。",
-  },
-  {
-    href: "/radar",
-    icon: Radar,
-    name: "雷达",
-    desc: "AI 模型排行与全国天气预警，由定时任务自动更新。",
   },
   {
     href: "/friends",
@@ -153,8 +146,8 @@ export default function AboutPage() {
                 方便日后翻找，也方便路过的你。
               </p>
               <p>
-                除了文章，这里还有一些点开就能用的小东西：工坊里是各类计算器与转换工具；
-                雷达上挂着 AI 模型排行与天气预警，由定时任务自动更新。
+                除了文章，这里还有一些点开就能用的小东西 —— 工坊里是各类计算器与转换工具，
+                全部在浏览器本地运行，不上传任何数据。
               </p>
               <p>
                 站点有两副面孔——日间「竹林风」，夜间「星月夜」，会按你的本地时间自动切换，

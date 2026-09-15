@@ -1,16 +1,18 @@
 # Next.js 静态博客模板
 
+[English](./README.en.md) · **中文**
+
 [![Next.js](https://img.shields.io/badge/Next.js-16.2.6-black?logo=next.js)](https://nextjs.org)
 [![React](https://img.shields.io/badge/React-19.2.4-087ea4?logo=react)](https://react.dev)
 [![Tailwind](https://img.shields.io/badge/Tailwind-v4-38bdf8?logo=tailwindcss)](https://tailwindcss.com)
 [![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 
-一个可以直接拿来用的中文个人博客框架：静态导出、双主题、MDX 写作、全文搜索，
-外加工坊小工具与数据面板。**开箱即可构建** —— 不配任何环境变量也能跑起来。
+一个可以直接拿来用的中文个人博客框架：静态导出、双主题、MDX 写作、全文搜索，外加工坊小工具。
+**开箱即可构建** —— 不配任何环境变量也能跑起来。
 
-- **日间主题**：竹林风 — 宣纸米白底色配竹青主色
-- **夜间主题**：星月夜 — 深邃夜空蓝底色配暖金星辉点缀
-- 主题按访问者的**本地时间**自动切换（06:00–18:00 为日间），也可手动切换
+- **日间主题**：竹林风 — 宣纸米白底色（`#FAFAF8`）配朱红主色（`#C43A1B`）
+- **夜间主题**：星月夜 — 近黑中性底（`#0A0A0D`）配暖金星辉与提亮朱红；蓝色只出现在夜空辉光层，底色本身保持中性
+- 主题按访问者的**本地时间**自动切换（06:00–17:59 为日间），也可手动切换
 
 ## 功能
 
@@ -19,17 +21,18 @@
 | 静态导出 | `output: "export"`，产物是纯 HTML/CSS/JS，可托管在任何静态空间 | — |
 | 双主题 | 日间竹林 / 夜间星月，CSS 变量驱动，无闪白 | — |
 | MDX 写作 | GFM 表格、KaTeX 公式、Shiki 代码高亮、自动目录、阅读时间 | — |
-| 全文搜索 | 构建期生成索引，前端模糊匹配，`Ctrl/Cmd + K` 唤起 | — |
+| 全文搜索 | 构建期生成索引，前端做大小写不敏感的子串匹配，`Ctrl/Cmd + K` 唤起 | — |
 | 三种聚合视图 | 按标签、按类型、按年份归档 | — |
-| SEO | RSS、sitemap、robots、Open Graph、JSON-LD 结构化数据 | 需填站点地址 |
+| SEO | RSS、sitemap、robots、Open Graph、JSON-LD 结构化数据 | 建议填站点地址 |
 | 分享图 / 图标 | 脚本生成 OG 图与图标，改站名后重跑即可换品牌 | — |
-| 工坊 | 随机数生成、Base64 编解码、ADHD 自测、工作性价比计算器（纯前端） | — |
-| 雷达 | AI 模型排行（抓取）、全国天气预警（和风天气 API） | 天气需 Key |
+| 工坊 | 随机数生成、Base64 编解码、ADHD 自测、工作性价比计算器（纯前端，不上传数据） | — |
 | 评论 | Waline，自建后端 | 需自建 |
 | 友链 | 卡片列表 + 申请说明 | — |
-| 小彩蛋 | 页脚竹苗随访问次数成长；切走标签页时标题变化 | — |
+| 小彩蛋 | 右下角竹苗随访问次数成长；切走标签页时标题变化 | — |
 
 ## 快速开始
+
+需要 **Node ≥ 20.19**（见 `package.json` 的 `engines`）。
 
 ```bash
 npm install
@@ -45,11 +48,15 @@ npm run build
 其它命令：
 
 ```bash
+npm run build:verify # 只构建、不跑构建链上的其它步骤，本地快速验证用
+npm start            # 本地预览 out/（等价于 npx serve out）
 npm run lint         # ESLint
 npx tsc --noEmit     # 类型检查
 npm test             # 单元测试（vitest）
-npm run build:verify # 只构建、不抓数据，用于本地快速验证
 ```
+
+> **`npm run dev` 下搜索是空的。** 搜索索引 `public/search-index.json` 是构建产物（已 gitignore），
+> `next dev` 不会生成它。想在开发时用搜索，先跑一次 `node scripts/generate-search-index.mjs`。
 
 ## 改成你自己的
 
@@ -57,23 +64,24 @@ npm run build:verify # 只构建、不抓数据，用于本地快速验证
 
 ### 1. 站点身份 —— 改 `site.config.mjs`
 
-站名、作者、标语、简介、中英文 locale、GitHub 用户名都在这一个文件里。
+站名、作者、标语、简介、语言 locale、GitHub 用户名都在这一个文件里。
 页面标题、SEO meta、RSS、sitemap、页头页脚、首页标题、友链页的「本站信息」
 全部从它取值，改一处即可全站生效。
 
 ```js
 export const siteConfig = {
   name: "示例博客",           // → 页面标题、页头页脚、首页大标题
-  tagline: "记录技术、思考与生活",  // → 首页副标题
-  description: "一个记录技术、思考与生活的个人博客。",  // → meta description
-  author: "示例博主",         // → 文章页署名、about 页
+  tagline: "记录技术、思考与生活",  // → 首页副标题、分享图标题行
+  description: "一个记录技术、思考与生活的个人博客。",  // → meta description、友链页「本站信息」
+  author: "示例博主",         // → meta 的 author/creator、文章页 JSON-LD
   github: "",                // → 留空则页脚与 about 页的 GitHub 入口自动隐藏
   // …
 };
 ```
 
-> 首页的大标题是**逐字动画**，字数不限 —— 它按 `Array.from(site.name)` 驱动，
-> 不必是四个字。
+> 首页的大标题是**逐字动画**，字数不限 —— 它按 `Array.from(site.name)` 驱动，不必是四个字。
+>
+> 注意 `author` 只影响 meta 与结构化数据，**页面上没有可见的作者署名**。
 
 ### 2. 站点地址 —— 复制 `.env.example` 为 `.env.local`
 
@@ -93,6 +101,10 @@ npm run icons  # → public/favicon.svg + apple-touch-icon.png（图标不含文
 
 **站名是烧进 PNG 像素的** —— 改了 `site.config.mjs` 之后不重跑 `npm run og`，
 分享图上的还是旧站名。这是最容易漏的一步：其它地方的站名会自动更新，只有图片不会。
+
+> ⚠️ 这两个脚本读的是**真实进程环境变量**，不是 `.env.local`（原因见「已知问题」）。
+> 若你的域名写在 `.env.local` 里，生成分享图时要显式传入：
+> `NEXT_PUBLIC_SITE_URL=https://your-domain npm run og`
 
 ### 4. 内容
 
@@ -122,13 +134,18 @@ npm run icons  # → public/favicon.svg + apple-touch-icon.png（图标不含文
 | `NEXT_PUBLIC_SITE_URL` | 站点根地址，用于 canonical / sitemap / RSS / JSON-LD | 回退到 `https://example.com` 并打印构建警告 |
 | `NEXT_PUBLIC_BASE_PATH` | 子路径前缀，仅项目页部署需要 | 视为部署在根路径 |
 | `NEXT_PUBLIC_WALINE_SERVER_URL` | Waline 评论后端地址 | 评论区显示「评论系统未配置」 |
-| `QWEATHER_KEY` | 和风天气 API Key | 跳过天气抓取，不阻断构建 |
-| `QWEATHER_HOST` | 和风天气专属 API Host | 同上 |
 
 ## 部署到 GitHub Pages
 
 仓库自带 `.github/workflows/deploy.yml`，推送到 `main` 即自动构建并发布。
-**站点地址与 basePath 会自动推导**，两种情况都无需配置：
+
+**首次部署前要做两件事**，否则不会有任何反应或部署失败：
+
+1. fork 出来的仓库默认**不启用 Actions** —— 到 Actions 标签页点一下启用
+   （不启用时推送后不会产生任何 workflow 运行，也没有报错提示）
+2. 到 **Settings → Pages**，把 **Source 设为 "GitHub Actions"**
+
+站点地址与 basePath 会**自动推导**，两种情况都无需配置：
 
 - **用户站点**（仓库名为 `<你的用户名>.github.io`）→ 地址在根，无 basePath
 - **项目页**（仓库名是别的，比如 fork 出来的这个模板）→ 自动用
@@ -150,6 +167,10 @@ npm run icons  # → public/favicon.svg + apple-touch-icon.png（图标不含文
 > `fetch("/search-index.json")`、正文里手写的 `<img src="/...">` 都属于这一类。
 > 本项目已经把这类引用统一交给 `lib/site.ts` 的 `publicUrl()` 处理；
 > **新增代码时若引用 `public/` 下的资源，请同样用它包一层**，否则子路径部署下会静默 404。
+>
+> 已知遗漏：`styles/theme.css` 里的自定义光标是 CSS `url("/cursors/*.svg")`，
+> CSS 无法调用 `publicUrl()`，因此**在子路径部署下这两个光标会 404**（静默退回系统光标）。
+> 修复方式是从 JS 注入 URL 变量，或把光标改到根路径部署。
 
 用自定义域名时，在仓库的 **Settings → Secrets and variables → Actions → Variables**
 里设置（注意是 Variables 不是 Secrets）：
@@ -157,32 +178,48 @@ npm run icons  # → public/favicon.svg + apple-touch-icon.png（图标不含文
 - `SITE_URL`，如 `https://blog.example.com`
 - `BASE_PATH`，自定义域名下通常留空
 
+> 只有同时设置了 `SITE_URL` 时 `BASE_PATH` 才会被读取；只设 `BASE_PATH` 会被静默忽略。
+
 ### 其它静态托管
 
-构建产物是 `out/` 目录，纯静态，可直接部署到 Cloudflare Pages、Netlify、
-Vercel、对象存储等。注意 `trailingSlash: true`，托管方需正确处理目录级 URL。
+构建产物是 `out/` 目录，纯静态，可直接部署到 Cloudflare Pages、Netlify、Vercel、
+对象存储等。注意 `trailingSlash: true`，托管方需正确处理目录级 URL。
+
+## 已知问题
+
+这些是当前版本确认存在、尚未修复的问题。都不影响构建，但会在特定场景下造成困惑。
+
+| 问题 | 影响 | 规避 |
+|------|------|------|
+| 构建链上的 `.mjs` 脚本**不读 `.env.local`**（只有 Next CLI 会读） | `npm run og`、`npm run avatars`、Waline 保活拿不到变量 | 生成资源时显式传环境变量：`NEXT_PUBLIC_SITE_URL=... npm run og` |
+| 工坊 Base64 页的「实时转换」复选框**不可见** | 看不出开关是开还是关 | `styles/components.css` 里那条 `input, textarea, select { appearance: none }` 是 unlayered 的，压掉了原生外观且没有 `:checked` 样式；需要时按此修 |
+| 开启「减少动态效果」时首页会发生 hydration 不匹配 | 控制台报错；首屏动画状态与静态 HTML 不一致 | `framer-motion` 的 `useReducedMotion()` 在 render 阶段就取值，服务端为 `null`，两端 `initial` 不同 |
+| **无 JS 时首页的标题、标语与两个入口按钮不可见** | 它们是 `opacity: 0` 的入场初态，靠 JS 揭幕 | 需要无 JS 可用时，给入场样式加 `@media (prefers-reduced-motion: no-preference)` 或补 `<noscript>` 兜底 |
+| 文章 frontmatter 有 YAML 语法错误时**静默消失** | 无任何日志，文章从站点上没了 | `lib/content.ts` 的 `readPostFile` 把解析异常和「文件不存在」一起吞了 |
 
 ## 可选功能与依赖
 
 | 功能 | 依赖 | 不配置时 |
 |------|------|----------|
 | 评论 | 自建 [Waline](https://waline.js.org/) 后端（可部署在 Vercel + Supabase 免费层） | 评论区显示未配置提示 |
-| 天气预警 | [和风天气](https://dev.qweather.com/) API Key 与专属 Host | 天气页显示既有数据或空态 |
-| AI 模型排行 | 无 —— 从公开页面抓取 | 抓取失败时回退到仓库内的缓存数据 |
 | 友链头像 | 无 —— `npm run avatars` 从 GitHub 下载 | 头像位回退为名称首字母 |
 
 `scripts/keepalive-waline.mjs` 会在构建时 ping 一次 Waline 后端，避免免费层数据库
 因约 7 天无活动被暂停。它是**永不阻断构建**的：任何失败只打印警告。
 
+> 部署到 GitHub Pages 时，让评论生效需要在仓库 Secrets 里创建名为
+> **`WALINE_SERVER_URL`** 的 secret（`deploy.yml` 按这个名字读取，再赋给环境变量
+> `NEXT_PUBLIC_WALINE_SERVER_URL`）。
+
 ## 删掉不需要的页面
 
-路由是文件式的，删除即下线。删完记得同步两处：
+路由是文件式的，删除即下线。删完记得同步三处：
 
 1. `app/sitemap.ts` 里的静态路由清单（否则 sitemap 会指向 404）
-2. `components/layout/nav-data.ts` 的导航项，以及 `app/about/page.tsx` 的模块导览
+2. `components/layout/nav-data.ts` 的导航项
+3. `app/about/page.tsx` 的模块导览，以及 `app/page.tsx` 底部的 `ENTRIES`
 
-常被删掉的：`app/radar/`（数据靠抓取，维护成本最高）、`app/friends/`、
-`app/guestbook/`（需要 Waline 后端）。
+常被删掉的：`app/friends/`、`app/guestbook/`（需要 Waline 后端）。
 
 ## 已知差异：Windows 本地构建
 
@@ -195,11 +232,10 @@ Vercel、对象存储等。注意 `trailingSlash: true`，托管方需正确处�
 | Windows | `__next.blog/__PAGE__.txt`（目录形式） |
 
 这些文件用于**客户端预取**。缺失的后果仅限于预取落空、点击链接时退化为整页跳转 ——
-导航功能本身正常（已实测：`工坊`/`文章`/`关于` 等入口的客户端跳转均正常，只是多一次整页加载）。
+导航功能本身正常（已实测：各入口的客户端跳转均正常，只是多一次整页加载）。
 
 **不需要处理**：仓库的部署走 GitHub Actions（`ubuntu-latest`），CI 构建产出的是扁平文件，
-与预期一致。若你希望在 Windows 本地预览时也消除这批 404，用 `npm run dev` 即可
-（开发模式不走静态导出，不存在这个问题）。
+与预期一致。若你希望在 Windows 本地预览时也消除这批 404，用 `npm run dev` 即可。
 
 > 这条记录于模板化时的实测。上游修好后可以删掉本节。
 
@@ -214,7 +250,6 @@ app/                    # 路由页面（App Router）
 ├── blog/[slug]/        # 文章详情（SSG）
 ├── tags/ types/ archive/   # 三种聚合视图
 ├── tools/              # 工坊
-├── radar/              # 雷达（LMArena 排行榜、天气预警）
 ├── friends/            # 友链
 ├── guestbook/          # 留言
 ├── about/              # 关于本站
@@ -223,20 +258,28 @@ app/                    # 路由页面（App Router）
 components/             # React 组件（按功能域分组）
 ├── layout/             # Header / DesktopNav / MobileDrawer / Footer / PageShell
 │                       #   SearchModal / ThemeToggle / TimeThemeController
-│                       #   GlobalUI / ErrorFallback / FarewellTitle / JsonLd
-├── blog/               # PostCard / MdxContent / TableOfContents / WalineComments
+│                       #   GlobalUI / ErrorFallback / FarewellTitle / JsonLd / nav-data
+├── blog/               # PostCard / PostCardSkeleton / MdxContent
+│                       #   TableOfContents / WalineComments
 ├── home/               # HeroSection（构图与时序）/ HeroScenery（场景绘制）
-├── tools/ radar/       # 各功能域的交互组件
-└── ui/                 # FadeUp / GlowCard / BambooSprout / CopyCodeButton 等
+├── tools/              # RandomNumber / Base64Tool / ADHDTest / WorkValueCalculator
+└── ui/                 # FadeUp / GlowCard / BambooSprout / CopyCodeButton
+                        #   BackToTop / ScrollProgress
 
 lib/                    # 核心业务逻辑（无 JSX、无浏览器 API）
 ├── content.ts          # 内容读取与处理（含正文图片尺寸读取与校验）
-├── data.ts             # 统一数据层（JSON 读取 + Zod 降级）
+├── data.ts             # 统一数据层（JSON 读取 + Zod 校验 + 降级兜底）
 ├── site.ts             # 站点身份的出口（读 site.config.mjs，派生逐字数组等）
 ├── schemas.ts          # Zod 校验模式
+├── types.ts            # 全局类型
+├── constants.ts        # 文章分类等常量
 ├── mdx.ts              # MDX 编译配置（插件链）
+├── readingTime.ts      # 阅读时间计算
 ├── timeTheme.ts        # 按本地时间切换日/夜主题
-└── bamboo.ts           # 竹苗彩蛋的阶段计算
+├── bamboo.ts           # 竹苗彩蛋的阶段计算
+├── random.ts           # 随机数算法
+├── tools.ts            # 工坊的工具配置数据
+└── a11y.ts             # 可访问性工具
 
 site.config.mjs         # ★ 站点身份的唯一来源（Node 脚本与应用共用）
 ```
@@ -246,8 +289,7 @@ site.config.mjs         # ★ 站点身份的唯一来源（Node 脚本与应用
 ```
 content/blog/<slug>/    # MDX 文章源文件（纯文本，不含图片）
 data/
-├── friends.json        # 友链
-└── radar/              # 抓取数据（lmarena / weather-alerts）
+└── friends.json        # 友链（唯一的数据文件，人工维护）
 public/                 # 静态资源（静态导出下唯一会被服务的位置）
 ├── blog/<slug>/        #   文章配图 —— 约定见 public/AGENTS.md
 ├── cursors/            #   自定义光标（日间竹叶 / 夜间星星）
@@ -260,12 +302,12 @@ public/                 # 静态资源（静态导出下唯一会被服务的位
 styles/                 # 全局样式（由 app/globals.css 统一导入）
 ├── theme.css           #   设计令牌与双主题变量（单一来源）
 ├── hero-scene.css      #   Hero 场景：SVG 绘制 + CSS 3D 纵深
-└── components.css / animations.css / print.css / waline.css
+└── components.css / animations.css / print.css
+                        #   waline.css 单独由 WalineComments 导入
 
 scripts/                # 构建链与手动资源生成器
-├── fetch-lmarena.mjs / fetch-weather-alerts.mjs    # 抓数据（缺配置则跳过）
-├── generate-search-index.mjs / generate-og.mjs / generate-icons.mjs
-├── keepalive-waline.mjs / fetch-avatars.mjs
+├── keepalive-waline.mjs / generate-search-index.mjs    # 构建链上（不阻断构建）
+├── generate-og.mjs / generate-icons.mjs / fetch-avatars.mjs   # 手动按需
 └── audit/              # 开发期校验工具（截图 / 性能），只手动跑
 ```
 
@@ -278,6 +320,7 @@ scripts/                # 构建链与手动资源生成器
 | `DESIGN.md` | 设计令牌与视觉规范的单一来源 |
 | `CLAUDE.md` | 架构约定、编码规范、代码与文档的同步映射 |
 | `app/` `components/` `lib/` `content/` `data/` `scripts/` `styles/` `public/` 下的 `AGENTS.md` | 各目录的细粒度规则与踩坑记录 |
+| `test/fixtures/blog/README.md` | 测试夹具说明 |
 
 改动代码后请同步对应文档 —— 具体映射见 `CLAUDE.md` 的「代码与文档同步」一节。
 
@@ -325,8 +368,9 @@ tocDepth: 2
 - 日间/夜间两套配色均满足 WCAG AA 对比度
 - 全站键盘可达：跳转主内容链接、可见焦点环、44px 触摸目标
 - `prefers-reduced-motion` 下关闭所有循环动画与入场编排，内容直出
-- 无 JS 时：Hero 场景静态呈现，正文与导航照常可用
-- 各数据层缺失时优雅降级，不阻断构建
+  （但首屏 Hero 存在 hydration 不一致，见「已知问题」）
+- 无 JS 时：Hero 场景静态呈现，正文与导航照常可用（首屏文字除外，见「已知问题」）
+- 数据读取失败时优雅降级，不阻断构建
 
 ## 许可
 

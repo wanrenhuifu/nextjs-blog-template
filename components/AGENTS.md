@@ -12,7 +12,6 @@
 | `blog/` | 博客阅读相关组件 | `PostCard`, `PostCardSkeleton`, `MdxContent`, `TableOfContents`, `WalineComments` |
 | `home/` | 首页专属组件 | `HeroSection`（构图与时序）、`HeroScenery`（场景绘制：竹、远山、星河、月轮、云气、光柱、萤火、落叶） |
 | `layout/` | 全局布局与导航 | `Header`, `Footer`, `PageShell`, `DesktopNav`, `MobileDrawer`, `SearchModal`, `ThemeToggle`, `TimeThemeController`, `BackLink`, `GlobalUI`, `PageTitle`, `ErrorFallback`, `FarewellTitle` |
-| `radar/` | 雷达与数据展示组件 | `LmArenaTable` |
 | `tools/` | 工具页面交互组件 | `RandomNumber`, `Base64Tool`, `ADHDTest`, `WorkValueCalculator` |
 | `ui/` | 通用 UI 原子组件 | `FadeUp`, `GlowCard`, `BambooSprout`, `CopyCodeButton`, `BackToTop`, `ScrollProgress` |
 
@@ -38,7 +37,7 @@
 ## 组件依赖方向
 
 ```
-ui/ (原子) ← blog/ / home/ / tools/ / radar/ (页面级)
+ui/ (原子) ← blog/ / home/ / tools/ (页面级)
      ↑
 layout/ (全局)
 ```
