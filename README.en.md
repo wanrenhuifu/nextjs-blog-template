@@ -10,6 +10,11 @@
 A ready-to-use static blog template: static export, dual themes, MDX authoring, full-text search,
 plus a small tool shed. **It builds out of the box** — no environment variables required.
 
+> **Live example** — [wanrenhuifu.github.io](https://wanrenhuifu.github.io) is this framework in
+> production. It is the "full" version: more posts, plus a radar section (AI leaderboards and
+> weather alerts) and extra tools on top of what the template ships. The template itself keeps
+> just one example tool; add the rest as you need them.
+
 - **Light theme** — bamboo grove: paper-white canvas (`#FAFAF8`) with a vermilion accent (`#C43A1B`)
 - **Dark theme** — starry night: near-black neutral canvas (`#0A0A0D`), warm-gold moon glow and a brighter vermilion. Blue appears only in the night-glow layer; the canvas itself stays neutral.
 - The theme switches automatically based on the **visitor's local time** (06:00–17:59 is light), and can be toggled manually.
