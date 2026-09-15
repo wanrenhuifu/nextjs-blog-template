@@ -1,7 +1,7 @@
 import type { ComponentType } from "react";
 import type { PostCategory } from "@/lib/constants";
 
-/** 文章内本地图片的原始尺寸，key 为图片的访问路径（如 `/claude梗图.webp`） */
+/** 文章内本地图片的原始尺寸，key 为图片的访问路径（如 `/blog/syntax-test/example.webp`） */
 export type ImageSizeMap = Record<string, { width: number; height: number }>;
 
 export interface Post {
