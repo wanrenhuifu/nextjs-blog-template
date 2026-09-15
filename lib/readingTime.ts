@@ -14,7 +14,9 @@ export function calculateReadingTime(body: string): number {
   // 去掉行内代码
   text = text.replace(/`[^`]+`/g, '');
 
-  // 去掉 frontmatter（Astro 通常已处理，保留以防万一）
+  // 去掉可能残留的 frontmatter 分隔块。
+  // 正常路径上 frontmatter 已由 lib/content.ts 剥离，这里是兜底 ——
+  // 本函数也接受未经处理的原始文本（如直接传入文件全文）。
   text = text.replace(/^---[\s\S]*?---/, '');
 
   // 去掉 HTML 标签
