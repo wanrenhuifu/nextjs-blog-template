@@ -7,6 +7,7 @@ import { Search, FileText, CornerDownLeft, Tag } from "lucide-react";
 import Link from "next/link";
 import type { SearchItem } from "@/lib/types";
 import { publicUrl } from "@/lib/site";
+import { useFocusTrap } from "./useFocusTrap";
 
 export function SearchModal({
   open,
@@ -19,6 +20,7 @@ export function SearchModal({
   const [items, setItems] = useState<SearchItem[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [indexFailed, setIndexFailed] = useState(false);
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -41,17 +43,27 @@ export function SearchModal({
   useEffect(() => {
     if (!open) return;
     if (fetchedRef.current) return;
+    // fetchedRef 只在**成功**后才置位：先前它在请求发出时就锁死，一次偶发的
+    // 失败（离线、瞬时错误）会让本次会话的搜索永远为空，且没有任何重试入口 ——
+    // 用户看到的是「未找到相关文章」，完全猜不到是索引没加载上。
     fetchedRef.current = true;
     // 裸 fetch 不会被 basePath 改写：子路径部署下漏了 publicUrl 会静默 404，
     // 表现是「搜索永远是空的」而控制台只有一条 404
     fetch(publicUrl("/search-index.json"))
-      .then((r) => (r.ok ? r.json() : []))
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
       .then((data: SearchItem[]) => {
-        setItems(data);
+        setItems(Array.isArray(data) ? data : []);
+        setIndexFailed(false);
         setLoading(false);
       })
       .catch(() => {
+        // 解除锁定，下次打开弹窗会重试
+        fetchedRef.current = false;
         setItems([]);
+        setIndexFailed(true);
         setLoading(false);
       });
   }, [open]);
@@ -78,27 +90,6 @@ export function SearchModal({
         }
       } else if (e.key === "Escape") {
         onClose();
-      } else if (e.key === "Tab") {
-        // Focus trap
-        const modal = modalRef.current;
-        if (!modal) return;
-        const focusable = modal.querySelectorAll<HTMLElement>(
-          'input, a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        );
-        if (focusable.length === 0) return;
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        if (e.shiftKey) {
-          if (document.activeElement === first) {
-            e.preventDefault();
-            last.focus();
-          }
-        } else {
-          if (document.activeElement === last) {
-            e.preventDefault();
-            first.focus();
-          }
-        }
       }
     },
     [open, filtered, selectedIndex, onClose, router]
@@ -109,11 +100,11 @@ export function SearchModal({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
+  // 焦点陷阱 + 关闭时归还焦点给打开它的按钮（原来只做了「打开时聚焦输入框」）
+  useFocusTrap(open, modalRef);
+
   useEffect(() => {
-    if (open) {
-      const t = setTimeout(() => inputRef.current?.focus(), 50);
-      return () => clearTimeout(t);
-    }
+    if (open) return;
     // 延迟重置，避免在 effect body 中同步 setState
     const t = setTimeout(() => {
       setQuery("");
@@ -187,14 +178,26 @@ export function SearchModal({
                   </div>
                 )}
 
-                {!loading && hasQuery && filtered.length === 0 && (
+                {/* 索引没加载上时必须说清楚 —— 否则用户只会看到「未找到相关文章」，
+                    误以为是自己关键词的问题 */}
+                {!loading && indexFailed && (
+                  <div className="px-5 py-10 text-center" role="status">
+                    <FileText className="w-8 h-8 text-muted mx-auto mb-3" strokeWidth={1.5} />
+                    <p className="text-base text-muted">搜索索引加载失败</p>
+                    <p className="text-sm text-muted mt-2">
+                      检查网络后关闭再打开本窗口即可重试
+                    </p>
+                  </div>
+                )}
+
+                {!loading && !indexFailed && hasQuery && filtered.length === 0 && (
                   <div className="px-5 py-10 text-center">
                     <FileText className="w-8 h-8 text-muted mx-auto mb-3" strokeWidth={1.5} />
                     <p className="text-base text-muted">未找到相关文章</p>
                   </div>
                 )}
 
-                {!loading && !hasQuery && (
+                {!loading && !indexFailed && !hasQuery && (
                   <div className="px-5 py-10 text-center text-base text-muted">
                     输入关键词开始搜索
                   </div>

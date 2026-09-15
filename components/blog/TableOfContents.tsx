@@ -77,6 +77,8 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
       <div className="order-first lg:hidden mb-8">
         <button
           onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+          aria-controls="toc-mobile-list"
           className="flex items-center gap-2 w-full px-4 py-3 rounded-xl bg-card border border-borderline text-body hover:border-primary/30 transition-colors"
         >
           <List className="w-4 h-4 text-primary" />
@@ -89,6 +91,8 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
         </button>
         {expanded && (
           <motion.nav
+            id="toc-mobile-list"
+            aria-label="文章目录"
             initial={shouldReduceMotion ? {} : { opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             className="mt-2 px-4 py-3 rounded-xl bg-card border border-borderline"
@@ -99,7 +103,7 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
       </div>
 
       {/* 桌面端侧边 TOC（宽屏下贴容器右缘，避免悬浮在大片留白左侧） */}
-      <aside className="hidden lg:block w-56 shrink-0 xl:ml-auto">
+      <aside aria-label="文章目录" className="hidden lg:block w-56 shrink-0 xl:ml-auto">
         <div
           ref={tocContainerRef}
           className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-borderline/60 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-borderline"

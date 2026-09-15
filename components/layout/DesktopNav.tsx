@@ -13,6 +13,11 @@ function isCoarsePointer(): boolean {
   return window.matchMedia("(hover: none), (pointer: coarse)").matches;
 }
 
+/** 下拉面板的 DOM id，供开关按钮的 aria-controls 引用（`/blog` → `nav-panel-blog`） */
+function panelId(href: string): string {
+  return `nav-panel-${href.replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
+}
+
 function NavIndicator({
   navRef,
   pathname,
@@ -148,11 +153,18 @@ export function DesktopNav() {
                 if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpenHref(null);
               }}
             >
+              {/*
+                这个按钮是「开合开关」，不是指向当前页的链接 —— 所以不挂 aria-current
+                （那是给一组链接里代表当前位置的那个用的，当前页信息由下拉内的子链接承担）。
+                aria-controls 指向面板，读屏用户才知道开关控制的是什么。
+              */}
               <button
                 type="button"
-                aria-current={active ? "page" : undefined}
                 aria-haspopup="true"
                 aria-expanded={isOpen}
+                aria-controls={panelId(item.href)}
+                /* 刻意阻止默认行为：鼠标点按不夺焦点，避免点完留下焦点环。
+                   键盘用户经 Tab 正常获得焦点，不受影响。 */
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => {
                   // 触控设备：点按即开合（开→收、收→开），再点按即收起，不会误跳转；
@@ -177,6 +189,7 @@ export function DesktopNav() {
 
               {/* 下拉面板：可见性由 openHref 状态统一驱动 */}
               <div
+                id={panelId(item.href)}
                 className={`absolute top-full left-1/2 -translate-x-1/2 pt-1.5 z-20
                   ${isOpen ? "opacity-100 visible" : "opacity-0 invisible"}
                   ${shouldReduceMotion ? "" : "transition-all duration-150"}

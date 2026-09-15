@@ -3,12 +3,13 @@
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { X, ChevronDown } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { navItems } from "./nav-data";
 import type { NavItem } from "@/lib/types";
 import { site } from "@/lib/site";
+import { useFocusTrap } from "./useFocusTrap";
 
 /** 计算「包含当前路径」应自动展开的分组集合 */
 function expandedGroupsFor(pathname: string): Set<string> {
@@ -39,6 +40,7 @@ export function MobileDrawer({
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(() =>
     expandedGroupsFor(pathname)
   );
+  const drawerRef = useRef<HTMLDivElement>(null);
 
   // 路由变化时同步展开「包含当前路径」的分组。
   // 采用渲染期调整状态（React 官方推荐写法），避免在 effect 中 setState。
@@ -153,6 +155,12 @@ export function MobileDrawer({
     );
   };
 
+  /**
+   * 焦点陷阱：抽屉里外都有可聚焦元素，不限制的话 Tab 会走到背后被遮住的页面上；
+   * 关闭时钩子会把焦点归还给 Header 里那个汉堡按钮（打开者）。
+   */
+  useFocusTrap(open, drawerRef);
+
   return (
     <AnimatePresence>
       {open && (
@@ -169,6 +177,11 @@ export function MobileDrawer({
 
           {/* Drawer */}
           <motion.div
+            ref={drawerRef}
+            data-print-hide
+            role="dialog"
+            aria-modal="true"
+            aria-label="导航菜单"
             className="fixed top-0 right-0 bottom-0 z-[91] w-[300px] max-w-[85vw] bg-app border-l border-borderline/60 flex flex-col"
             initial={shouldReduceMotion ? {} : { x: "100%" }}
             animate={{ x: 0 }}
@@ -203,7 +216,10 @@ export function MobileDrawer({
             <div className="px-5 py-4 border-t border-borderline/60 shrink-0">
               <div className="flex items-center justify-between">
                 <span className="text-[13px] text-muted">主题</span>
-                <ThemeToggle />
+                {/* 必须给一个**不同的** id：Header 里已有一个 id="theme-toggle" 的实例，
+                    抽屉打开时两个同时挂载，重复 id 会让打印样式与 getElementById 产生歧义。
+                    注意不能传 `undefined` —— 那会触发参数默认值，等于没传。 */}
+                <ThemeToggle id="theme-toggle-drawer" />
               </div>
             </div>
           </motion.div>

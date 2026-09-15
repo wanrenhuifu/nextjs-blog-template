@@ -17,7 +17,11 @@ const subscribeMounted = () => () => {};
 const getMounted = () => true;
 const getServerNotMounted = () => false;
 
-export function ThemeToggle() {
+/**
+ * @param id  DOM id，默认 "theme-toggle"（`styles/print.css` 用它隐藏打印时的切换按钮）。
+ *            抽屉里会再渲染一个实例，两处同时挂载就会出现重复 id —— 那里传 `undefined`。
+ */
+export function ThemeToggle({ id = "theme-toggle" }: { id?: string } = {}) {
   const { resolvedTheme, setTheme } = useTheme();
   const shouldReduceMotion = useReducedMotion();
   // 节流只作用于首页：Hero 日夜场景 0.9s 交叉淡出只在首页存在（见 HeroSection.tsx）
@@ -67,7 +71,7 @@ export function ThemeToggle() {
 
   return (
     <button
-      id="theme-toggle"
+      id={id}
       onClick={handleToggle}
       className="flex items-center justify-center min-w-11 min-h-11 text-muted hover:text-title transition-colors duration-200 focus-ring"
       aria-label={isDark ? "切换到日间模式" : "切换到夜间模式"}

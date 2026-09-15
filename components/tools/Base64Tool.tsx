@@ -125,7 +125,7 @@ export function Base64Tool() {
       {/* Input */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="block text-sm font-medium text-body">输入内容</label>
+          <label htmlFor="base64-input" className="block text-sm font-medium text-body">输入内容</label>
           <div className="flex items-center gap-3">
             <label className="inline-flex items-center gap-1.5 text-xs text-muted cursor-pointer select-none">
               <input
@@ -140,6 +140,7 @@ export function Base64Tool() {
           </div>
         </div>
         <textarea
+          id="base64-input"
           rows={5}
           value={input}
           placeholder="在此输入文本或粘贴 Base64 内容..."
@@ -185,7 +186,7 @@ export function Base64Tool() {
       {/* Output */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="block text-sm font-medium text-body">转换结果</label>
+          <label htmlFor="base64-output" className="block text-sm font-medium text-body">转换结果</label>
           <div className="flex items-center gap-3">
             <span className="text-xs text-muted tabular-nums">{output.length} 字符</span>
             <button
@@ -198,14 +199,21 @@ export function Base64Tool() {
           </div>
         </div>
         <textarea
+          id="base64-output"
           ref={outputRef}
           rows={5}
           readOnly
           value={output}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? "base64-error" : undefined}
           placeholder="转换结果将显示在这里..."
           className="w-full px-3 py-2.5 rounded-lg bg-app border border-borderline text-body placeholder-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors resize-y font-mono text-base sm:text-sm leading-relaxed"
         />
-        {error && <p className="text-sm text-danger">{error}</p>}
+        {error && (
+          <p id="base64-error" role="alert" className="text-sm text-danger">
+            {error}
+          </p>
+        )}
       </div>
     </div>
   );

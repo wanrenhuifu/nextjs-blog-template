@@ -127,16 +127,22 @@ export function ADHDTest() {
                       key={opt.value}
                       className="relative cursor-pointer select-none"
                     >
+                      {/*
+                        原生 radio 用 sr-only 藏起来，键盘焦点必须由这层可见的 span 表达出来 ——
+                        否则键盘用户按 Tab 走过 6 道题时，屏幕上没有任何位置提示
+                        （视觉上只有「已选中」态，而焦点与选中是两回事）。
+                        peer-focus-visible 让焦点环只在键盘操作时出现，鼠标点击不闪。
+                      */}
                       <input
                         type="radio"
                         name={q.id}
                         value={opt.value}
                         checked={isSelected}
                         onChange={() => selectOption(q.id, opt.value)}
-                        className="sr-only"
+                        className="peer sr-only"
                       />
                       <span
-                        className={`flex items-center justify-center gap-1 min-h-11 px-3 py-2 text-[0.8125rem] font-medium rounded-[0.625rem] border-[1.5px] text-center transition-all duration-150 ${
+                        className={`flex items-center justify-center gap-1 min-h-11 px-3 py-2 text-[0.8125rem] font-medium rounded-[0.625rem] border-[1.5px] text-center transition-all duration-150 peer-focus-visible:ring-2 peer-focus-visible:ring-primary/50 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-app ${
                           isSelected
                             ? "bg-primary/10 border-primary text-primary font-semibold"
                             : "bg-card border-borderline text-body hover:border-[color-mix(in_srgb,var(--theme-primary)_40%,var(--theme-borderline))] hover:bg-[color-mix(in_srgb,var(--theme-primary)_5%,var(--theme-card))]"

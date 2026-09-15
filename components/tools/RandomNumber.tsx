@@ -77,6 +77,12 @@ export function RandomNumber() {
   const [result, setResult] = useState<number[]>([]);
   const [summary, setSummary] = useState("");
   const [error, setError] = useState("");
+  /**
+   * 出错字段的 id。用于把 aria-invalid 只标在真正有问题的那一个控件上 ——
+   * 先前所有输入框共用一个表单级错误，读屏软件会把 6 个框全报成「无效」，
+   * 反而定位不到问题。
+   */
+  const [errorField, setErrorField] = useState("");
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [copied, setCopied] = useState(false);
   const [copiedHistory, setCopiedHistory] = useState<number | null>(null);
@@ -88,26 +94,33 @@ export function RandomNumber() {
   const decimalsPreview = parseInt10(decimalsRaw) ?? 0;
   const uniqueApplicable = distribution === "uniform" && decimalsPreview === 0;
 
+  /** 报错并记录归属字段：`field` 对应控件的 id */
+  const fail = useCallback((message: string, field: string) => {
+    setError(message);
+    setErrorField(field);
+  }, []);
+
   const generate = useCallback(() => {
     setError("");
+    setErrorField("");
 
     const count = parseInt10(countRaw);
     const decimals = parseInt10(decimalsRaw);
 
     if (count === null || decimals === null) {
-      setError("请填写有效的整数");
+      fail("请填写有效的整数", "rn-count");
       return;
     }
     if (decimals < 0 || decimals > MAX_DECIMALS) {
-      setError(`小数位数请在 0–${MAX_DECIMALS} 之间`);
+      fail(`小数位数请在 0–${MAX_DECIMALS} 之间`, "rn-decimals");
       return;
     }
     if (count < 1) {
-      setError("生成数量至少为 1");
+      fail("生成数量至少为 1", "rn-count");
       return;
     }
     if (count > MAX_COUNT) {
-      setError(`生成数量不能超过 ${MAX_COUNT}`);
+      fail(`生成数量不能超过 ${MAX_COUNT}`, "rn-count");
       return;
     }
 
@@ -119,15 +132,15 @@ export function RandomNumber() {
       const sd = parseDecimal(sdRaw);
 
       if (mean === null || sd === null) {
-        setError("请填写有效的均值与标准差");
+        fail("请填写有效的均值与标准差", "rn-mean");
         return;
       }
       if (Math.abs(mean) > MAX_ABS || Math.abs(sd) > MAX_ABS) {
-        setError(`数值请控制在 ±${MAX_ABS.toLocaleString("en-US")} 以内`);
+        fail(`数值请控制在 ±${MAX_ABS.toLocaleString("en-US")} 以内`, "rn-min");
         return;
       }
       if (sd <= 0) {
-        setError("标准差必须大于 0");
+        fail("标准差必须大于 0", "rn-sd");
         return;
       }
 
@@ -138,15 +151,15 @@ export function RandomNumber() {
       const max = parseDecimal(maxRaw);
 
       if (min === null || max === null) {
-        setError("请填写有效的最小值与最大值");
+        fail("请填写有效的最小值与最大值", "rn-min");
         return;
       }
       if (Math.abs(min) > MAX_ABS || Math.abs(max) > MAX_ABS) {
-        setError(`数值请控制在 ±${MAX_ABS.toLocaleString("en-US")} 以内`);
+        fail(`数值请控制在 ±${MAX_ABS.toLocaleString("en-US")} 以内`, "rn-min");
         return;
       }
       if (min > max) {
-        setError("最小值不能大于最大值");
+        fail("最小值不能大于最大值", "rn-min");
         return;
       }
 
@@ -194,6 +207,7 @@ export function RandomNumber() {
     sdRaw,
     unique,
     uniqueApplicable,
+    fail,
   ]);
 
   const reset = useCallback(() => {
@@ -280,7 +294,7 @@ export function RandomNumber() {
                 value={minRaw}
                 onChange={(e) => setMinRaw(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && generate()}
-                aria-invalid={!!error}
+                aria-invalid={error ? errorField === "rn-min" : undefined}
                 className={INPUT_CLASS}
               />
             </div>
@@ -295,7 +309,7 @@ export function RandomNumber() {
                 value={maxRaw}
                 onChange={(e) => setMaxRaw(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && generate()}
-                aria-invalid={!!error}
+                aria-invalid={error ? errorField === "rn-max" : undefined}
                 className={INPUT_CLASS}
               />
             </div>
@@ -313,7 +327,7 @@ export function RandomNumber() {
                 value={meanRaw}
                 onChange={(e) => setMeanRaw(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && generate()}
-                aria-invalid={!!error}
+                aria-invalid={error ? errorField === "rn-mean" : undefined}
                 className={INPUT_CLASS}
               />
             </div>
@@ -328,7 +342,7 @@ export function RandomNumber() {
                 value={sdRaw}
                 onChange={(e) => setSdRaw(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && generate()}
-                aria-invalid={!!error}
+                aria-invalid={error ? errorField === "rn-sd" : undefined}
                 className={INPUT_CLASS}
               />
             </div>
@@ -346,7 +360,7 @@ export function RandomNumber() {
             value={decimalsRaw}
             onChange={(e) => setDecimalsRaw(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && generate()}
-            aria-invalid={!!error}
+            aria-invalid={error ? errorField === "rn-decimals" : undefined}
             className={INPUT_CLASS}
           />
         </div>
@@ -362,7 +376,7 @@ export function RandomNumber() {
             value={countRaw}
             onChange={(e) => setCountRaw(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && generate()}
-            aria-invalid={!!error}
+            aria-invalid={error ? errorField === "rn-count" : undefined}
             className={INPUT_CLASS}
           />
         </div>

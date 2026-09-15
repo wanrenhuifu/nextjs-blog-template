@@ -18,8 +18,8 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/keepalive-waline.mjs && node scripts/generate-search-index.mjs && next build",
-    "build:verify": "node scripts/generate-search-index.mjs && next build",
+    "build": "node scripts/keepalive-waline.mjs && node scripts/generate-search-index.mjs && next build && node scripts/prune-out.mjs",
+    "build:verify": "node scripts/generate-search-index.mjs && next build && node scripts/prune-out.mjs",
     "start": "npx --yes serve out",
     "lint": "eslint",
     "test": "vitest run",

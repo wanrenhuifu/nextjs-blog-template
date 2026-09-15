@@ -69,16 +69,40 @@ jobs:
           CUSTOM_URL: ${{ vars.SITE_URL }}
           CUSTOM_BASE: ${{ vars.BASE_PATH }}
         run: |
+          # GitHub 的仓库名/用户名大小写不敏感，而 shell 的字符串比较敏感 ——
+          # 仓库若是 Alice/alice.github.io，直接比较会掉进「项目页」分支，
+          # 得出 https://Alice.github.io/alice.github.io 这种地址（资源全 404）。
+          # 统一转小写再比。
+          OWNER_LC="${OWNER,,}"
+          REPO_LC="${REPO,,}"
+
+          # 1) 先定 URL：自定义域名优先，否则按「用户站点 / 项目页」推导
           if [ -n "$CUSTOM_URL" ]; then
-            echo "url=$CUSTOM_URL" >> "$GITHUB_OUTPUT"
-            echo "base_path=$CUSTOM_BASE" >> "$GITHUB_OUTPUT"
-          elif [ "$REPO" = "$OWNER.github.io" ]; then
-            echo "url=https://$OWNER.github.io" >> "$GITHUB_OUTPUT"
-            echo "base_path=" >> "$GITHUB_OUTPUT"
+            url="$CUSTOM_URL"
+            derived_base=""
+          elif [ "$REPO_LC" = "$OWNER_LC.github.io" ]; then
+            url="https://$OWNER.github.io"
+            derived_base=""
           else
-            echo "url=https://$OWNER.github.io/$REPO" >> "$GITHUB_OUTPUT"
-            echo "base_path=/$REPO" >> "$GITHUB_OUTPUT"
+            url="https://$OWNER.github.io/$REPO"
+            derived_base="/$REPO"
           fi
+
+          # 2) 再定 basePath：显式设置的 BASE_PATH 独立生效（不再依赖是否设了 SITE_URL），
+          #    没设才回落到推导值。先前只设 BASE_PATH 会被静默忽略。
+          base="${CUSTOM_BASE:-$derived_base}"
+          # 去掉尾斜杠：Next 的 basePath 不接受尾斜杠，而 "/" 的语义就是「部署在根路径」
+          base="${base%/}"
+
+          # 3) 两者矛盾时提前警告：这是「整站白屏 / canonical 指向错处」的典型成因。
+          #    注意必须用 [[ ]] —— 单括号 [ ] 里的 * 只是普通字符，判断会恒为真。
+          if [ -n "$base" ] && [[ "${url%/}" != *"$base" ]]; then
+            echo "::warning title=站点地址与 basePath 可能不一致::SITE_URL ($url) 未以 BASE_PATH ($base) 结尾。子路径部署下 SITE_URL 应包含该子路径"
+          fi
+
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "base_path=$base" >> "$GITHUB_OUTPUT"
+          echo "解析结果：SITE_URL=$url  BASE_PATH=${base:-（空）}"
 
       - name: Build with Next.js
         env:

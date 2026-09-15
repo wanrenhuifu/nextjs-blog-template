@@ -191,17 +191,14 @@ Variables — note *Variables*, not Secrets):
 The build output is `out/` — plain static files, deployable to Cloudflare Pages, Netlify, Vercel,
 object storage, etc. Note `trailingSlash: true`: the host must serve directory-style URLs correctly.
 
-## Known issues
+## Accessibility
 
-These are confirmed, currently unfixed issues. None of them break the build.
-
-| Issue | Impact |
-|-------|--------|
-| Accessibility gaps in some form controls: tool-page labels lack `htmlFor`/`id` association, the ADHD self-screen's options have **no keyboard focus style**, and the mobile drawer lacks `role="dialog"` plus a focus trap | Degraded usability for keyboard and screen-reader users (WCAG 2.4.7 and others) |
-| The search index is **built only at build time** and is not retried on failure | After an offline or failed fetch, search stays empty for the rest of the session with no error shown |
-| `styles/theme.css` defines a number of **unused tokens** (most of the 18 gray steps, `--theme-skeleton-to`, …) | Misleading when re-theming: changing them has no effect |
-| `deploy.yml`'s user-site detection is case-sensitive, and setting only `BASE_PATH` without `SITE_URL` is silently ignored | Configuration has no effect for repo names with capitals, or when you only want to change the sub-path |
-| `public/AGENTS.md` is copied verbatim into the build output, so `https://<site>/AGENTS.md` is publicly reachable | Internal engineering notes are published. Deleting the file fixes it, at the cost of losing the `public/` directory conventions doc |
+- Both themes meet WCAG AA contrast
+- Fully keyboard navigable: skip link, visible focus rings, 44px touch targets
+- Form controls have accessible names; tool errors are announced via `role="alert"`, and `aria-invalid` is set only on the field that actually failed
+- Overlays (search modal, mobile drawer) expose `role="dialog"` + `aria-modal`, trap focus while open, and return focus to the button that opened them
+- `prefers-reduced-motion` disables all looping animations and the entrance choreography
+- With JavaScript disabled, a `<noscript>` style takes over the entrance animations' initial state, so above-the-fold text and lists stay visible
 
 ## Optional features
 
@@ -369,16 +366,6 @@ All frontmatter fields, image conventions and typography rules are documented in
 | Validation | Zod |
 | Testing | Vitest |
 | Comments | Waline (optional) |
-
-## Accessibility and degradation
-
-- Both themes meet WCAG AA contrast
-- Fully keyboard navigable: skip link, visible focus rings, 44px touch targets
-- `prefers-reduced-motion` disables all looping animations and the entrance choreography
-  (though the hero has a hydration mismatch — see Known issues)
-- Without JavaScript: the hero scene renders statically and body text/navigation work
-  (except the above-the-fold headline — see Known issues)
-- Data read failures degrade gracefully and never block the build
 
 ## License
 

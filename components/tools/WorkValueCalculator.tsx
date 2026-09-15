@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useId, useState, useCallback, useRef } from "react";
 import { DollarSign, Calculator, RotateCcw, ChevronDown } from "lucide-react";
 import { smoothScrollIntoView, prefersReducedMotion } from "@/lib/a11y";
 
@@ -162,8 +162,9 @@ export function WorkValueCalculator() {
       {/* Salary Card */}
       <WvCard icon={<DollarSign className="w-4 h-4" />} iconClass="wv-icon-salary" title="薪资信息" badge={null}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <WvField label="月薪（税前，元）">
+          <WvField label="月薪（税前，元）" htmlFor="wv-salary">
             <input
+              id="wv-salary"
               type="number"
               value={salary}
               min={0}
@@ -173,8 +174,9 @@ export function WorkValueCalculator() {
               className="wv-input"
             />
           </WvField>
-          <WvField label="每月工作天数">
+          <WvField label="每月工作天数" htmlFor="wv-workdays">
             <input
+              id="wv-workdays"
               type="number"
               value={workdays}
               min={1}
@@ -422,10 +424,28 @@ function WvCard({
   );
 }
 
-function WvField({ label, children }: { label: string; children: React.ReactNode }) {
+/**
+ * 带标签的表单行。
+ *
+ * `htmlFor` 是必填的：先前这里是 `<label>` 与控件互为兄弟、却没有 `for`，
+ * 于是每个输入框都没有可访问名称（读屏软件只会念「编辑框」）。
+ * 不用「把控件包进 label」的隐式关联写法，是因为「按天/按月」那几个字段的
+ * children 里还有 +/− 按钮，按钮落在 label 内会让点击被转义到输入框上。
+ */
+function WvField({
+  label,
+  htmlFor,
+  children,
+}: {
+  label: string;
+  htmlFor: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-[0.8125rem] font-medium text-body">{label}</label>
+      <label htmlFor={htmlFor} className="text-[0.8125rem] font-medium text-body">
+        {label}
+      </label>
       {children}
     </div>
   );
@@ -442,10 +462,12 @@ function WvSelectField({
   onChange: (v: string) => void;
   children: React.ReactNode;
 }) {
+  const id = useId();
   return (
-    <WvField label={label}>
+    <WvField label={label} htmlFor={id}>
       <div className="relative">
         <select
+          id={id}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="w-full appearance-none border-[1.5px] border-borderline bg-card text-title text-sm py-2.5 pl-3.5 pr-9 rounded-[0.625rem] outline-none focus:border-primary focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--theme-primary)_18%,transparent)] transition-colors cursor-pointer"
@@ -475,17 +497,20 @@ function StepField({
   step: number;
   onEnter: () => void;
 }) {
+  const id = useId();
   return (
-    <WvField label={label}>
+    <WvField label={label} htmlFor={id}>
       <div className="flex items-stretch gap-0">
         <button
           type="button"
+          aria-label={`减少${label}`}
           onClick={() => onChange(Math.min(Math.max(Math.round((value - stepVal) / stepVal) * stepVal, min), max))}
           className="w-9 flex items-center justify-center border-[1.5px] border-borderline bg-card text-muted font-semibold rounded-l-[0.625rem] border-r-0 hover:bg-[color-mix(in_srgb,var(--theme-primary)_8%,var(--theme-card))] hover:text-primary hover:border-[color-mix(in_srgb,var(--theme-primary)_40%,var(--theme-borderline))] transition-colors"
         >
           −
         </button>
         <input
+          id={id}
           type="number"
           value={value}
           min={min}
@@ -497,6 +522,7 @@ function StepField({
         />
         <button
           type="button"
+          aria-label={`增加${label}`}
           onClick={() => onChange(Math.min(Math.max(Math.round((value + stepVal) / stepVal) * stepVal, min), max))}
           className="w-9 flex items-center justify-center border-[1.5px] border-borderline bg-card text-muted font-semibold rounded-r-[0.625rem] border-l-0 hover:bg-[color-mix(in_srgb,var(--theme-primary)_8%,var(--theme-card))] hover:text-primary hover:border-[color-mix(in_srgb,var(--theme-primary)_40%,var(--theme-borderline))] transition-colors"
         >

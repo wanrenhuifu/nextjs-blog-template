@@ -15,9 +15,6 @@
   --color-primary-active: var(--theme-primary-active);
 
   /* === 辅助色 === */
-  --color-accent: var(--theme-accent);
-  --color-decor: var(--theme-decor);
-  --color-pop: var(--theme-pop);
 
   /* === 主色背景上的文本 === */
   --color-on-primary: var(--theme-on-primary);
@@ -27,44 +24,22 @@
   --color-warning: var(--theme-warning);
   --color-danger: var(--theme-danger);
   --color-info: var(--theme-info);
-  --color-caution: var(--theme-caution);
 
   /* === 灰阶（日间 900 最深，夜间 900 最浅） === */
-  --color-gray-50: var(--theme-gray-50);
-  --color-gray-100: var(--theme-gray-100);
-  --color-gray-200: var(--theme-gray-200);
-  --color-gray-300: var(--theme-gray-300);
-  --color-gray-400: var(--theme-gray-400);
-  --color-gray-500: var(--theme-gray-500);
-  --color-gray-600: var(--theme-gray-600);
-  --color-gray-700: var(--theme-gray-700);
-  --color-gray-800: var(--theme-gray-800);
   --color-gray-900: var(--theme-gray-900);
 
   /* === 链接 === */
-  --color-link: var(--theme-link);
-  --color-link-hover: var(--theme-link-hover);
-  --color-link-visited: var(--theme-link-visited);
 
   /* === 代码高亮 === */
-  --color-code-bg: var(--theme-code-bg);
-  --color-code-line-highlight: var(--theme-code-line-highlight);
 
   /* === 特殊表面 === */
-  --color-glass-bg: var(--theme-glass-bg);
-  --color-overlay: var(--theme-overlay);
-  --color-selection: var(--theme-selection);
   --color-skeleton: var(--theme-skeleton-from);
-  --color-skeleton-from: var(--theme-skeleton-from);
-  --color-skeleton-to: var(--theme-skeleton-to);
 
   /* === 额外强调 === */
   --color-accent-2: var(--theme-accent-2);
   --color-accent-3: var(--theme-accent-3);
 
   /* === 高度（卡片投影：日间靠阴影撑层次，夜间改由表面色阶承担） === */
-  --shadow-card: var(--theme-shadow-card);
-  --shadow-lift: var(--theme-shadow-lift);
 
   /* === 字体 === */
   /* 标题走宋体系系统栈，不再挂网络字体 —— 见 app/layout.tsx 顶部的实测数据说明。
@@ -75,11 +50,9 @@
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
   /* === 文字尺寸 === */
-  --text-display-xl: clamp(2.25rem, 5vw, 4.5rem);
   --text-title-md: 1.25rem;
   --text-title-sm: 1.125rem;
   --text-body-sm: 0.875rem;
-  --text-body-md: 1rem;
   --text-caption: 0.75rem;
 }
 
@@ -116,39 +89,22 @@
   --theme-star: #E9E5D8;        /* 星点（月白） */
   --theme-star-gold: #E3C98A;   /* 星点（淡金） */
 
-  --theme-accent: #FBEDE8;      /* 朱红淡染 — 点缀表面 */
   --theme-decor: #8A8A92;       /* 中性灰 — 装饰与次要图标 */
-  --theme-pop: transparent;
 
   --theme-success: #2F7D4F;
   --theme-warning: #A16207;
   --theme-danger: #BE1E3C;      /* 偏红（色相 348°）与朱红主色（14°）区分得开 */
   --theme-info: #1D6FB8;
-  --theme-caution: #8A6D0B;
 
-  --theme-gray-50: #FAFAF8;
-  --theme-gray-100: #F4F4F1;
-  --theme-gray-200: #E8E8E4;
-  --theme-gray-300: #D6D6D0;
-  --theme-gray-400: #A8A8A2;
-  --theme-gray-500: #7C7C78;
-  --theme-gray-600: #5C5C5A;
-  --theme-gray-700: #40403E;
-  --theme-gray-800: #262625;
   --theme-gray-900: #0F0F10;
 
   --theme-link: #0B6E77;        /* 青 — 与朱红主色形成冷暖对位 */
-  --theme-link-hover: #095256;
-  --theme-link-visited: #7A3E9D;
 
   --theme-code-bg: #101012;
   --theme-code-line-highlight: #1C1C20;
 
-  --theme-glass-bg: rgba(250, 250, 248, 0.80);
-  --theme-overlay: rgba(10, 10, 11, 0.40);
   --theme-selection: rgba(196, 58, 27, 0.22);
   --theme-skeleton-from: #F4F4F1;
-  --theme-skeleton-to: #E8E8E4;
 
   --theme-accent-2: #B26A00;
   --theme-accent-3: #0B6E77;
@@ -212,44 +168,27 @@
   --theme-star-gold: #E3C98A;
 
   /* === 辅助色 === */
-  --theme-accent: #1E1E24;       /* 暗表面 — 点缀 */
   --theme-decor: #6A6A76;        /* 中性灰 — 装饰/次要图标 */
-  --theme-pop: #FF6B4A;          /* 弹出强调 — 同主色 */
 
   /* === 功能色 === */
   --theme-success: #3FBF7F;
   --theme-warning: #F0B429;
   --theme-danger: #FF6B81;
   --theme-info: #5AA9E6;
-  --theme-caution: #E0B93C;
 
   /* === 灰阶（夜间 900 最浅） === */
-  --theme-gray-50: #0A0A0D;      /* Canvas */
-  --theme-gray-100: #151519;     /* Card */
-  --theme-gray-200: #202027;     /* Hover */
-  --theme-gray-300: #2C2C34;     /* Borderline */
-  --theme-gray-400: #3E3E48;     /* 禁用态 */
-  --theme-gray-500: #5A5A66;     /* 占位符 */
-  --theme-gray-600: #8E8E9A;     /* Muted */
-  --theme-gray-700: #C6C6CE;     /* Body */
-  --theme-gray-800: #E0E0E6;     /* 降级强调 */
   --theme-gray-900: #F5F5F2;     /* Title */
 
   /* === 链接 === */
   --theme-link: #3FC6D2;         /* 青提亮 */
-  --theme-link-hover: #6FDCE6;
-  --theme-link-visited: #B79CE8;
 
   /* === 代码块 === */
   --theme-code-bg: #08080A;      /* 比画布更深 */
   --theme-code-line-highlight: #1A1A20;
 
   /* === 特殊表面 === */
-  --theme-glass-bg: rgba(10, 10, 13, 0.85);
-  --theme-overlay: rgba(0, 0, 0, 0.80);
   --theme-selection: rgba(255, 107, 74, 0.25);
   --theme-skeleton-from: #151519;
-  --theme-skeleton-to: #2C2C34;
 
   /* === 点缀色 === */
   --theme-accent-2: #F0B429;
