@@ -227,15 +227,32 @@ function normalizeDate(raw: string | Date | undefined): string {
   return isNaN(d.getTime()) ? "1970-01-01" : d.toISOString().split("T")[0];
 }
 
-function parseFrontmatter(data: Record<string, unknown>) {
+function parseFrontmatter(data: Record<string, unknown>, slug: string) {
   const result = postFrontmatterSchema.safeParse(data);
   if (!result.success) {
-    console.error("[content] frontmatter 校验失败:", result.error.flatten());
+    // 带上 slug：先前只打印校验细节，一篇文章被剔除时看不出是哪一篇
+    console.error(
+      `[content] frontmatter 校验失败，该文章已被跳过：${slug}`,
+      result.error.flatten(),
+    );
     return null;
   }
   return result.data;
 }
 
+/**
+ * 读取文章源文件。
+ *
+ * 两种失败必须分开处理，否则会得到一个极难排查的现象（曾经就是这样）：
+ * - **文件不存在**（ENOENT）→ 静默试下一个扩展名，这是正常控制流；
+ * - **frontmatter 的 YAML 语法错误** → gray-matter 会抛异常。以前这里一个裸
+ *   `catch {}` 把它和「文件不存在」一起吞掉，文章于是**无声无息地从站点上消失**：
+ *   没有日志、没有警告，列表里只是少了一篇，往往只有作者本人会察觉。
+ *
+ * 现在 YAML 错误会打印带文件路径与原始报错的明确日志，然后跳过该文章 ——
+ * 跳过而非中断构建，与「frontmatter 校验失败」的既有处理保持一致（见
+ * data/AGENTS.md 的「缺失或损坏文件的后果」一节：内容问题一律降级 + 大声报错）。
+ */
 async function readPostFile(
   slug: string
 ): Promise<{ data: Record<string, unknown>; content: string } | null> {
@@ -243,12 +260,29 @@ async function readPostFile(
 
   for (const ext of [".mdx", ".md"]) {
     const filePath = path.join(dir, `index${ext}`);
+
+    let raw: string;
     try {
-      const raw = await fs.readFile(filePath, "utf-8");
+      raw = await fs.readFile(filePath, "utf-8");
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") continue;
+      // 权限、占用等：不是「换一个扩展名就能解决」的问题，要说出来
+      console.error(`[content] 读取失败：${filePath}`, error);
+      continue;
+    }
+
+    try {
       const { data, content } = matter(raw);
       return { data, content };
-    } catch {
-      // continue to next extension
+    } catch (error) {
+      console.error(
+        `[content] frontmatter 解析失败，该文章已被跳过：${filePath}
+` +
+          `          ${(error as Error).message}
+` +
+          `          常见原因：引号未闭合、缩进有误、值里含未转义的冒号或 #。`,
+      );
+      return null;
     }
   }
 
@@ -259,7 +293,7 @@ async function getPostMetaBySlug(slug: string): Promise<PostMeta | null> {
   const file = await readPostFile(slug);
   if (!file) return null;
 
-  const frontmatter = parseFrontmatter(file.data);
+  const frontmatter = parseFrontmatter(file.data, slug);
   if (!frontmatter) return null;
 
   return {
@@ -281,7 +315,7 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
   const file = await readPostFile(slug);
   if (!file) return null;
 
-  const frontmatter = parseFrontmatter(file.data);
+  const frontmatter = parseFrontmatter(file.data, slug);
   if (!frontmatter) return null;
 
   const meta: PostMeta = {

@@ -111,9 +111,9 @@ npm run icons  # → public/favicon.svg + apple-touch-icon.png (no text in them;
 `npm run og`, the share image keeps the old name. This is the easiest step to forget: everything
 else updates automatically, the image does not.
 
-> ⚠️ These scripts read **real process environment variables**, not `.env.local` (see Known issues).
-> If your domain lives in `.env.local`, pass it explicitly:
-> `NEXT_PUBLIC_SITE_URL=https://your-domain npm run og`
+These scripts load `.env.local` just like `next build` does (via `scripts/load-env.mjs`), so
+`npm run og` works as-is once you have configured it. Real environment variables (e.g. CI secrets)
+take precedence and are never overwritten by the file.
 
 ### 4. Content
 
@@ -177,9 +177,6 @@ The site URL and basePath are derived automatically — no configuration needed 
 > automatic prefixing. This template routes those through `publicUrl()` in `lib/site.ts`;
 > **wrap new references the same way**, otherwise they silently 404 under a sub-path.
 >
-> Known gap: the custom cursors in `styles/theme.css` are CSS `url("/cursors/*.svg")`, and CSS
-> cannot call `publicUrl()`, so they **404 under a sub-path deployment** (silently falling back to
-> system cursors). Fix by injecting the URL from JS, or deploy at the domain root.
 
 With a custom domain, set repository **Variables** (Settings → Secrets and variables → Actions →
 Variables — note *Variables*, not Secrets):
@@ -196,16 +193,15 @@ object storage, etc. Note `trailingSlash: true`: the host must serve directory-s
 
 ## Known issues
 
-These are confirmed, currently unfixed issues. None of them break the build, but each causes
-confusion in a specific situation.
+These are confirmed, currently unfixed issues. None of them break the build.
 
-| Issue | Impact | Notes |
-|-------|--------|-------|
-| Build-chain `.mjs` scripts **do not read `.env.local`** (only the Next CLI does) | `npm run og`, `npm run avatars` and the Waline keep-alive see no variables | Pass them explicitly: `NEXT_PUBLIC_SITE_URL=... npm run og` |
-| The Base64 tool's "live conversion" **checkbox is invisible** | You cannot tell whether it is on or off | The unlayered `input, textarea, select { appearance: none }` in `styles/components.css` strips the native control and there is no `:checked` style |
-| Hydration mismatch on the home page when **reduced motion** is enabled | Console error; the entrance animation state differs from the static HTML | `framer-motion`'s `useReducedMotion()` resolves during render while the server sees `null`, so `initial` differs between the two |
-| **With JavaScript disabled, the home page headline, tagline and both CTA buttons are invisible** | They start at `opacity: 0` and are revealed by JS | Add `@media (prefers-reduced-motion: no-preference)` around the entrance styles, or a `<noscript>` fallback |
-| A **YAML syntax error in frontmatter makes the post silently disappear** | No log at all; the article is simply gone | `readPostFile` in `lib/content.ts` swallows parse errors together with "file not found" |
+| Issue | Impact |
+|-------|--------|
+| Accessibility gaps in some form controls: tool-page labels lack `htmlFor`/`id` association, the ADHD self-screen's options have **no keyboard focus style**, and the mobile drawer lacks `role="dialog"` plus a focus trap | Degraded usability for keyboard and screen-reader users (WCAG 2.4.7 and others) |
+| The search index is **built only at build time** and is not retried on failure | After an offline or failed fetch, search stays empty for the rest of the session with no error shown |
+| `styles/theme.css` defines a number of **unused tokens** (most of the 18 gray steps, `--theme-skeleton-to`, …) | Misleading when re-theming: changing them has no effect |
+| `deploy.yml`'s user-site detection is case-sensitive, and setting only `BASE_PATH` without `SITE_URL` is silently ignored | Configuration has no effect for repo names with capitals, or when you only want to change the sub-path |
+| `public/AGENTS.md` is copied verbatim into the build output, so `https://<site>/AGENTS.md` is publicly reachable | Internal engineering notes are published. Deleting the file fixes it, at the cost of losing the `public/` directory conventions doc |
 
 ## Optional features
 

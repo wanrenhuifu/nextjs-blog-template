@@ -7,6 +7,7 @@
  *
  * 用法：node scripts/generate-og.mjs
  */
+import "./load-env.mjs";
 import path from "path";
 import { fileURLToPath } from "url";
 import sharp from "sharp";

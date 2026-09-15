@@ -18,7 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **测试** —— 单元测试走 vitest（`npm test` / `npm run test:watch`）。`playwright-chromium` 已被 `scripts/audit/` 下的视觉与性能校验脚本使用（逐页截图、FCP/LCP 测量），但**没有接入任何 E2E 测试框架**，不要假设存在端到端测试。
 - 单独运行脚本：`node scripts/<name>.mjs`（如 `node scripts/generate-search-index.mjs`）。
 - **构建链上的步骤永不阻断构建** —— 这是刻意设计，因为 fork 后首次构建必须能跑通。`keepalive-waline.mjs` 缺 `NEXT_PUBLIC_WALINE_SERVER_URL` 时静默跳过，后端不可达也只打印警告。CI 中由 GitHub Actions secrets 注入。
-- **`.mjs` 脚本读不到 `.env.local`** —— 只有 Next CLI 会加载它。构建时要让保活生效需传入真实环境变量（`NEXT_PUBLIC_WALINE_SERVER_URL=... npm run build`），`npm run og` / `npm run avatars` 同理。
+- **`.mjs` 脚本通过 `scripts/load-env.mjs` 读 `.env.local`** —— 用 Node 内置的 `process.loadEnvFile()`，无额外依赖；已存在的进程环境变量优先（CI secrets 不会被本地文件覆盖）。新增脚本若需要环境变量，在 import 区加一行 `import "./load-env.mjs";` 即可。
 - **`next build` 与 `next dev` 共用 `.next` 目录，不要同时跑。** 在 dev server 运行期间执行 `npm run build:verify` 会覆盖 dev 的增量编译状态，此后**部分路由会永久挂起、不再响应**（实测 `/tools/random-number/` 卡死 90s 无响应，首页却正常，极易误判成代码 bug）。遇到这种症状先停掉 dev、`rm -rf .next`、再重启即可恢复。
 
 ## 架构总览：三条数据管线
@@ -68,9 +68,11 @@ API、约定和文件结构与训练数据中的常规 Next.js 项目可能不�
 7. **静态导出约束** —— 所有路由必须是 SSG 友好，不使用 `headers()`/`cookies()` 等动态 API；图片使用 `unoptimized: true`。
 8. **数据层统一** —— JSON 数据读取必须通过 `lib/data.ts`，禁止在 page 组件中直接 `fs.readFile`。新增数据源时优先扩展 `lib/data.ts`。
 9. **类型集中管理** —— 全局接口定义在 `lib/types.ts`，禁止在多文件中重复定义同一类型。
-10. **组件职责单一** —— Header 已拆分为 `DesktopNav` / `MobileDrawer` / `Header` 外壳。新增布局组件时遵循相同粒度。布局组件（`components/layout/`）只负责布局，业务组件按领域分目录（`blog/`, `tools/` 等）。
-11. **禁止 dead code** —— 组件不应保留无调用方的 prop 分支（如已删除的 `standalone` 模式）。清理组件时同步删除对应的 CSS 样式。
-12. **代码与文档同步** —— 每次修改代码后必须检查并同步对应的文档：
+10. **入场动画必须有无 JS 兜底** —— Hero 的 `.hero-entrance` / `.hero-title-char` / `.hero-brush` 与列表用的 `.fade-up` 初态都是 `opacity: 0`，靠 JS 揭幕。新增这类「JS 才显示」的元素时，必须同时把它的选择器加进两处清单：`app/layout.tsx` 的 `<noscript>` 样式（管 JS 被禁用）与 `styles/animations.css` 的 `prefers-reduced-motion` 块（管减少动态效果）。两处用 `!important` 压过内联样式。
+11. **reduced-motion 不要改变 `initial`** —— `framer-motion` 的 `useReducedMotion()` 在服务端返回 `null`、客户端首帧即取值，用它切换 `initial` 会让两端 HTML 不一致并触发 hydration 报错。降级只应体现在 `transition` 的时长/延迟上（见 `HeroSection.tsx` 的 `enter()`）。
+12. **组件职责单一** —— Header 已拆分为 `DesktopNav` / `MobileDrawer` / `Header` 外壳。新增布局组件时遵循相同粒度。布局组件（`components/layout/`）只负责布局，业务组件按领域分目录（`blog/`, `tools/` 等）。
+13. **禁止 dead code** —— 组件不应保留无调用方的 prop 分支（如已删除的 `standalone` 模式）。清理组件时同步删除对应的 CSS 样式。
+14. **代码与文档同步** —— 每次修改代码后必须检查并同步对应的文档：
     - 新增/删除页面路由或 loading/error 边界 → 更新 `app/AGENTS.md` 路由映射表
     - 新增/删除组件 → 更新 `components/AGENTS.md` 子目录示例
     - 新增/删除 lib 工具函数 → 更新 `lib/AGENTS.md` 文件说明表
@@ -79,7 +81,7 @@ API、约定和文件结构与训练数据中的常规 Next.js 项目可能不�
     - 修改设计令牌（颜色/字体/间距）→ 同步 `DESIGN.md` 与 `styles/theme.css`
     - 修改技术栈版本 → 同步 `README.md` 和 `CLAUDE.md` 技术栈表格
     - 修改数据文件结构 → 同步 `data/AGENTS.md` 字段说明
-13. **useEffect 审计**（Code Review 必查） —— 审查 PR 时，必须检查每个 `useEffect` 的三个维度：
+15. **useEffect 审计**（Code Review 必查） —— 审查 PR 时，必须检查每个 `useEffect` 的三个维度：
     - **依赖数组**：是否遗漏或多余？`resolvedTheme` 等异步解析值是否会导致多余的重跑？
     - **cleanup 时机**：cleanup 是否在依赖变化时意外销毁了本应保持的实例（如第三方库、订阅、定时器）？正确做法是将 destroy 放在独立 `useEffect(() => { return () => destroy(); }, [])` 中，仅组件卸载时执行。
     - **初始化守卫**：是否有 `ref.current` 或 flag 防止重复初始化？异步依赖就绪前是否有 `undefined` 守卫？

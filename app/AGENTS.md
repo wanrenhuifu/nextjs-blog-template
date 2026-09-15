@@ -21,7 +21,7 @@
 | `app/friends/page.tsx` | 友链页 |
 | `app/guestbook/page.tsx` | 留言 (Waline) |
 | `app/tools/page.tsx` | 工坊工具列表页 |
-| `app/tools/ToolsPageClient.tsx` | 工坊列表的筛选交互（Client Component，与路由同目录就地放置） |
+| `app/tools/ToolsPageClient.tsx` | 工坊列表（Client Component，与路由同目录就地放置）。按 quick / more / projects 分组渲染，**没有筛选交互** |
 | `app/tools/random-number/page.tsx` | 随机数生成器 |
 | `app/tools/base64/page.tsx` | Base64 编解码工具 |
 | `app/tools/adhd/page.tsx` | ADHD 自测工具页 |
@@ -31,9 +31,9 @@
 | `app/sitemap.ts` | 站点地图 |
 | `app/error.tsx` | 全局错误边界 |
 | `app/not-found.tsx` | 全局 404 |
-| `app/layout.tsx` | 根布局 (字体加载 + 元数据 + Header + Footer) |
+| `app/layout.tsx` | 根布局（元数据、主题种子脚本、无 JS 兜底样式、Header/GlobalUI）。**不含字体加载**（字体全走系统栈，见 `CLAUDE.md`），Footer 由 `components/layout/PageShell.tsx` 渲染 |
 | `app/providers.tsx` | Client Provider (ThemeProvider) |
-| `app/globals.css` | 全局样式入口 (导入 Tailwind + theme/animations/components/print) |
+| `app/globals.css` | 全局样式入口（导入 Tailwind + theme/animations/**hero-scene**/components/print；`waline.css` 由 `WalineComments` 单独导入） |
 | `components/layout/ErrorFallback.tsx` | 通用错误回退 UI 组件 |
 | `app/blog/error.tsx` | 文章列表页错误边界 |
 | `app/blog/[slug]/error.tsx` | 文章详情页错误边界 |
@@ -71,7 +71,12 @@
    - 交互逻辑、状态、事件监听、动画在 Client Component（文件首行 `"use client"`）完成。
 6. **CSS 导入** —— 项目全局样式集中在 `app/globals.css` 中通过 `@import` 导入。第三方库 CSS（如 KaTeX、Waline）和对应的组件级覆盖样式可在使用时按需导入。
 7. **内容读取路径** —— 服务端读取本地数据时使用 `path.join(process.cwd(), "data", ...)` 或 `path.join(process.cwd(), "content", ...)`。
-8. **generateStaticParams 值保持原始** —— 返回的参数字段值应当是原始字符串（如中文标签 `"测试"`），Next.js 会自动处理 URL 编码/解码。禁止手动 `encodeURIComponent`，否则会导致客户端导航路由不匹配。
+8. **generateStaticParams 值保持原始** —— 返回的参数字段值应当是原始字符串（如中文标签 `"测试"`），Next.js 会自动处理 URL 编码/解码。
+   在**返回值里**禁止手动 `encodeURIComponent`，否则会导致客户端导航路由不匹配。
+   同理，读到的 `params.tag` / `params.slug` **已经是原始值，不要再 `decodeURIComponent`** ——
+   标签含裸 `%`（如「100%增长」）时它会抛 `URIError` 让整个构建失败（见 `app/tags/[tag]/page.tsx` 的注释）。
+   需要编码的只有一处：写进 HTML 的 canonical / sitemap 链接，那里要用 `encodeURIComponent`，
+   与 `app/sitemap.ts` 的标签 URL 保持同一形态。
 
 ## 禁止事项
 

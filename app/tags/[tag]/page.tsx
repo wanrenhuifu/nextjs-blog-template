@@ -7,6 +7,19 @@ import { FadeUp } from "@/components/ui/FadeUp";
 import { Hash } from "lucide-react";
 import { BackLink } from "@/components/layout/BackLink";
 
+/**
+ * 标签路由参数就是**原始标签字符串**，不要在这里再解码一次。
+ *
+ * 依据：`generateStaticParams` 直接返回标签原文，静态导出时落成的目录名就是它
+ * （见 `out/tags/<标签>/`；`app/AGENTS.md` 也把「值保持原始、禁止手动编码」写成了规则）。
+ * 先前这里调了 `decodeURIComponent`，带来两个后果：
+ * - 标签含裸 `%`（如「100%增长」）→ 抛 `URIError: URI malformed`，**整个构建失败**；
+ * - 标签含 `%20` 这类序列 → 被静默解码成另一个字符串，页面渲染成「该标签下暂无文章」。
+ *
+ * 需要编码的地方只有一处：写进 HTML 的 canonical 要用 `encodeURIComponent`，
+ * 与 `app/sitemap.ts` 里标签 URL 的编码方式保持一致。
+ */
+
 export async function generateStaticParams() {
   const tags = await getAllTags();
   return tags.map(({ tag }) => ({ tag }));
@@ -18,12 +31,11 @@ export async function generateMetadata({
   params: Promise<{ tag: string }>;
 }) {
   const { tag } = await params;
-  const decoded = decodeURIComponent(tag);
   return {
-    title: `标签：${decoded}`,
-    description: `${site.name}的博客中带有「${decoded}」标签的文章`,
+    title: `标签：${tag}`,
+    description: `${site.name}的博客中带有「${tag}」标签的文章`,
     alternates: {
-      canonical: absoluteUrl(`/tags/${tag}/`),
+      canonical: absoluteUrl(`/tags/${encodeURIComponent(tag)}/`),
     },
   };
 }
@@ -34,8 +46,7 @@ export default async function TagPage({
   params: Promise<{ tag: string }>;
 }) {
   const { tag } = await params;
-  const decoded = decodeURIComponent(tag);
-  const posts = await getPostsByTag(decoded);
+  const posts = await getPostsByTag(tag);
 
   return (
     <PageShell>
@@ -48,7 +59,7 @@ export default async function TagPage({
             <div className="w-1 h-6 rounded-full bg-primary/60" />
             <div className="flex items-center gap-3">
               <Hash className="w-5 h-5 text-primary" />
-              <PageTitle>{decoded}</PageTitle>
+              <PageTitle>{tag}</PageTitle>
               <span className="text-body-sm text-muted">
                 {posts.length} 篇文章
               </span>

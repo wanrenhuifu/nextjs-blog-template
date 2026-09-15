@@ -162,9 +162,18 @@
   --theme-shadow-card: 0 1px 2px rgba(10, 10, 11, 0.04), 0 1px 3px rgba(10, 10, 11, 0.06);
   --theme-shadow-lift: 0 4px 12px rgba(10, 10, 11, 0.06), 0 12px 32px -8px rgba(10, 10, 11, 0.10);
 
-  /* 自定义光标 — 竹叶（渲染 32×32，hotspot 对准叶尖 (2,2)） */
-  --cursor-default: url("/cursors/bamboo-leaf.svg") 2 2, auto;
-  --cursor-pointer: url("/cursors/bamboo-leaf.svg") 2 2, pointer;
+  /*
+   * 自定义光标 — 竹叶（渲染 32×32，hotspot 对准叶尖 (2,2)）。
+   *
+   * url 外面套 var(--cursor-leaf-url, …) 是为了兼容子路径部署：
+   * CSS 里的根绝对路径不会被 Next 的 basePath/assetPrefix 改写，而 CSS 又无法调用
+   * lib/site.ts 的 publicUrl()，所以项目页部署时这里会 404、光标静默退回系统默认。
+   * 解法是由 CursorAssets 组件（components/layout/CursorAssets.tsx）在 basePath
+   * 非空时把变量设成带前缀的地址；根路径部署下变量为空，走 fallback 的写法，
+   * 保持「无 JS 也有自定义光标」。
+   */
+  --cursor-default: var(--cursor-leaf-url, url("/cursors/bamboo-leaf.svg")) 2 2, auto;
+  --cursor-pointer: var(--cursor-leaf-url, url("/cursors/bamboo-leaf.svg")) 2 2, pointer;
 }
 
 /* 🌙 夜间模式 (星月夜) */
@@ -255,9 +264,9 @@
   --theme-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.40);
   --theme-shadow-lift: 0 8px 24px -6px rgba(0, 0, 0, 0.60);
 
-  /* 自定义光标 — 星星（渲染 40×40，hotspot 对准左上角尖 (4,6)） */
-  --cursor-default: url("/cursors/star.svg") 4 6, auto;
-  --cursor-pointer: url("/cursors/star.svg") 4 6, pointer;
+  /* 自定义光标 — 星星（渲染 40×40，hotspot 对准左上角尖 (4,6)）。理由同上 */
+  --cursor-default: var(--cursor-star-url, url("/cursors/star.svg")) 4 6, auto;
+  --cursor-pointer: var(--cursor-star-url, url("/cursors/star.svg")) 4 6, pointer;
 }
 
 /* 🌙 暗色模式下强制 prose 文字变亮 */

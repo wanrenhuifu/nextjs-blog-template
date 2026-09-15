@@ -102,9 +102,8 @@ npm run icons  # → public/favicon.svg + apple-touch-icon.png（图标不含文
 **站名是烧进 PNG 像素的** —— 改了 `site.config.mjs` 之后不重跑 `npm run og`，
 分享图上的还是旧站名。这是最容易漏的一步：其它地方的站名会自动更新，只有图片不会。
 
-> ⚠️ 这两个脚本读的是**真实进程环境变量**，不是 `.env.local`（原因见「已知问题」）。
-> 若你的域名写在 `.env.local` 里，生成分享图时要显式传入：
-> `NEXT_PUBLIC_SITE_URL=https://your-domain npm run og`
+脚本与 `next build` 一样会读 `.env.local`（经 `scripts/load-env.mjs`），所以配好之后
+直接 `npm run og` 即可。CI 等场景下传入的真实环境变量优先级更高，不会被仓库里的文件覆盖。
 
 ### 4. 内容
 
@@ -168,9 +167,6 @@ npm run icons  # → public/favicon.svg + apple-touch-icon.png（图标不含文
 > 本项目已经把这类引用统一交给 `lib/site.ts` 的 `publicUrl()` 处理；
 > **新增代码时若引用 `public/` 下的资源，请同样用它包一层**，否则子路径部署下会静默 404。
 >
-> 已知遗漏：`styles/theme.css` 里的自定义光标是 CSS `url("/cursors/*.svg")`，
-> CSS 无法调用 `publicUrl()`，因此**在子路径部署下这两个光标会 404**（静默退回系统光标）。
-> 修复方式是从 JS 注入 URL 变量，或把光标改到根路径部署。
 
 用自定义域名时，在仓库的 **Settings → Secrets and variables → Actions → Variables**
 里设置（注意是 Variables 不是 Secrets）：
@@ -187,15 +183,15 @@ npm run icons  # → public/favicon.svg + apple-touch-icon.png（图标不含文
 
 ## 已知问题
 
-这些是当前版本确认存在、尚未修复的问题。都不影响构建，但会在特定场景下造成困惑。
+这些是当前版本确认存在、尚未修复的问题。都不影响构建。
 
-| 问题 | 影响 | 规避 |
-|------|------|------|
-| 构建链上的 `.mjs` 脚本**不读 `.env.local`**（只有 Next CLI 会读） | `npm run og`、`npm run avatars`、Waline 保活拿不到变量 | 生成资源时显式传环境变量：`NEXT_PUBLIC_SITE_URL=... npm run og` |
-| 工坊 Base64 页的「实时转换」复选框**不可见** | 看不出开关是开还是关 | `styles/components.css` 里那条 `input, textarea, select { appearance: none }` 是 unlayered 的，压掉了原生外观且没有 `:checked` 样式；需要时按此修 |
-| 开启「减少动态效果」时首页会发生 hydration 不匹配 | 控制台报错；首屏动画状态与静态 HTML 不一致 | `framer-motion` 的 `useReducedMotion()` 在 render 阶段就取值，服务端为 `null`，两端 `initial` 不同 |
-| **无 JS 时首页的标题、标语与两个入口按钮不可见** | 它们是 `opacity: 0` 的入场初态，靠 JS 揭幕 | 需要无 JS 可用时，给入场样式加 `@media (prefers-reduced-motion: no-preference)` 或补 `<noscript>` 兜底 |
-| 文章 frontmatter 有 YAML 语法错误时**静默消失** | 无任何日志，文章从站点上没了 | `lib/content.ts` 的 `readPostFile` 把解析异常和「文件不存在」一起吞了 |
+| 问题 | 影响 |
+|------|------|
+| 部分表单控件的无障碍缺口：工具页的标签缺少 `htmlFor`/`id` 关联、ADHD 自测的选项**没有键盘焦点样式**、移动端抽屉缺 `role="dialog"` 与焦点陷阱 | 键盘与读屏用户可用性受损（WCAG 2.4.7 等） |
+| 搜索索引**只在构建时生成**，且失败后不重试 | 离线或请求失败时，该会话的搜索会一直为空，且没有错误提示 |
+| `styles/theme.css` 里有若干**定义了但没人用**的令牌（如 18 级灰阶中的多数、`--theme-skeleton-to`） | 改配色时容易被误导，以为改它们会有效果 |
+| `deploy.yml` 判定「用户站点」时区分大小写；只设 `BASE_PATH` 而不设 `SITE_URL` 会被静默忽略 | 仓库名含大写、或只想改子路径时配置不生效 |
+| `public/AGENTS.md` 会被原样复制进产物，于是 `https://<站点>/AGENTS.md` 可访问 | 内部工程规范被发布到线上。删除该文件即可，但会少一份 `public/` 目录的约定说明 |
 
 ## 可选功能与依赖
 

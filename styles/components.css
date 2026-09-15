@@ -278,13 +278,33 @@
 
 /* ========== 移动端全局优化 ========== */
 
-/* 输入框在 iOS 上的样式修复 */
-input,
+/*
+ * 输入框样式修复。这里有两处必须避开的坑，都是踩过才知道的：
+ *
+ * 1) **不要给复选框/单选/按钮去掉原生外观。** 它们没有 :checked 样式可接管，
+ *    `appearance: none` 会连同 border-width、background 一起被 Tailwind 的
+ *    preflight 清零，最后渲染成一个透明空方块 —— 看不出开关是开还是关
+ *    （Base64 工具的「实时转换」就这样隐身过）。
+ *    用 :where() 收窄作用范围，同时保持选择器权重为 0，不干扰工具类。
+ *
+ * 2) **字号那条只在窄屏生效。** 这条规则没有包在 @layer 里，而未分层样式
+ *    在权重比较之前就压过 @layer utilities —— 无条件写 16px 会让
+ *    `text-sm` 之类的字号工具类在表单控件上全部失效。
+ *    它的本意只是防 iOS 聚焦缩放，所以放在移动端媒体查询里就够了。
+ */
+input:where(:not([type="checkbox"], [type="radio"], [type="submit"], [type="button"], [type="reset"], [type="range"], [type="file"], [type="color"])),
 textarea,
 select {
-  font-size: 16px; /* 防止 iOS 聚焦时自动缩放 */
   -webkit-appearance: none;
   appearance: none;
+}
+
+@media (max-width: 768px) {
+  input:where(:not([type="checkbox"], [type="radio"], [type="submit"], [type="button"], [type="reset"], [type="range"], [type="file"], [type="color"])),
+  textarea,
+  select {
+    font-size: 16px; /* 防止 iOS 聚焦时自动缩放 */
+  }
 }
 
 /* 移动端滚动优化 */

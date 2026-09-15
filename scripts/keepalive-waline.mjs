@@ -13,6 +13,8 @@
  * - 请求超时 / HTTP 非 200 / errno 非 0 → 仅打印警告，退出码仍为 0。
  */
 
+import "./load-env.mjs";
+
 const serverUrl = process.env.NEXT_PUBLIC_WALINE_SERVER_URL;
 
 if (!serverUrl) {

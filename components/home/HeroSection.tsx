@@ -125,8 +125,21 @@ export function HeroSection() {
     return () => window.removeEventListener("replay-hero", handler);
   }, [reduceMotion]);
 
-  /** 入场动画的公共初态：reduced-motion 时一律直出 */
-  const from = (state: Record<string, number | string>) => (reduceMotion ? false : state);
+  /**
+   * 入场过渡：reduced-motion 下把时长与延迟都压到 0。
+   *
+   * **刻意不使用 `initial={reduceMotion ? false : state}` 这种写法** ——
+   * `useReducedMotion()` 在服务端返回 null、在客户端首帧就同步取值（framer-motion 的
+   * use-reduced-motion.mjs 在 render 阶段调用 initPrefersReducedMotion），于是服务端
+   * 会序列化出 `style="opacity:0…"` 而客户端首帧不写任何样式，两端 HTML 不一致 →
+   * 开启「减少动态效果」的用户每次进首页都会撞 hydration 报错。
+   * 现在初态恒定，差异只体现在 transition 的数值上（不影响序列化结果）。
+   */
+  const enter = (duration: number, delay: number) => ({
+    duration: reduceMotion ? 0 : duration,
+    delay: reduceMotion ? 0 : delay,
+    ease: ENTRANCE_EASE,
+  });
 
   return (
     <section ref={sectionRef} className="relative min-h-svh overflow-hidden bg-app">
@@ -184,13 +197,9 @@ export function HeroSection() {
                 /* 用 索引 参与 key：站名含重复字时（如「哈哈」）纯字符 key 会重复 */
                 key={`${char}-${i}`}
                 className="hero-title-char"
-                initial={from({ opacity: 0, y: 34, filter: "blur(18px)" })}
+                initial={{ opacity: 0, y: 34, filter: "blur(18px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{
-                  duration: 1.25,
-                  delay: T.firstChar + i * T.charStep,
-                  ease: ENTRANCE_EASE,
-                }}
+                transition={enter(1.25, T.firstChar + i * T.charStep)}
               >
                 {char}
               </motion.span>
@@ -199,16 +208,16 @@ export function HeroSection() {
 
           {/* 笔锋：一道自左向右写就的短横，替代原来的分隔细线 */}
           <motion.div
-            className="mt-7 sm:mt-8"
-            initial={from({ opacity: 0 })}
+            className="hero-entrance mt-7 sm:mt-8"
+            initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: T.brush }}
+            transition={{ duration: reduceMotion ? 0 : 0.5, delay: reduceMotion ? 0 : T.brush }}
           >
             <motion.div
               className="hero-brush"
-              initial={from({ scaleX: 0 })}
+              initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
-              transition={{ duration: 1.05, delay: T.brush, ease: ENTRANCE_EASE }}
+              transition={enter(1.05, T.brush)}
               style={{ transformOrigin: "left center" }}
             >
               <svg viewBox="0 0 150 8" width="148" height="6" aria-hidden="true">
@@ -221,21 +230,21 @@ export function HeroSection() {
           </motion.div>
 
           <motion.p
-            className="mt-7 max-w-md text-base leading-relaxed text-body sm:mt-8 sm:text-lg"
-            initial={from({ opacity: 0, y: 14 })}
+            className="hero-entrance mt-7 max-w-md text-base leading-relaxed text-body sm:mt-8 sm:text-lg"
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: T.tagline, ease: ENTRANCE_EASE }}
+            transition={enter(0.9, T.tagline)}
           >
             {site.tagline}
           </motion.p>
 
           {/* 入口：主次两级。填充自左向右扫入，箭头随之前移 */}
           <motion.nav
-            className="mt-12 flex flex-wrap items-center justify-center gap-3 sm:mt-14 sm:gap-4"
+            className="hero-entrance mt-12 flex flex-wrap items-center justify-center gap-3 sm:mt-14 sm:gap-4"
             aria-label="快捷入口"
-            initial={from({ opacity: 0, y: 16 })}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: T.cta, ease: ENTRANCE_EASE }}
+            transition={enter(0.9, T.cta)}
           >
             <Link href="/blog" className="hero-cta hero-cta--primary">
               <span>读文章</span>
@@ -251,10 +260,10 @@ export function HeroSection() {
         {/* 滚动提示：一道反复向下生长的细线，比跳动箭头安静 */}
         <motion.div
           id="scroll-hint"
-          className="absolute bottom-7 left-1/2 z-10 -translate-x-1/2"
-          initial={from({ opacity: 0 })}
+          className="hero-entrance absolute bottom-7 left-1/2 z-10 -translate-x-1/2"
+          initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: T.hint }}
+          transition={{ duration: reduceMotion ? 0 : 1, delay: reduceMotion ? 0 : T.hint }}
         >
           <span className="scroll-hint">
             <span className="scroll-hint__label">向下滚动</span>

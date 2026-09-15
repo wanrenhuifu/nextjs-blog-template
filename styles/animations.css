@@ -13,11 +13,28 @@
   transform: translateY(0);
 }
 
-/* 减弱动画偏好 */
+/*
+ * 入场动画的初态（`.fade-up`、Hero 的 `.hero-entrance` / `.hero-title-char` /
+ * `.hero-brush`）都是 `opacity: 0`，靠 JS 揭幕。这带来两种「内容看不见」的场景：
+ *
+ *   1. **完全禁用 JS** —— IntersectionObserver / Framer Motion 都不会运行；
+ *   2. **开启「减少动态效果」** —— 动画时长被压到 0，理论上直接跳到终态，
+ *      但首帧仍可能闪一下（且我们不希望任何人因为一个动效偏好而看到空白）。
+ *
+ * 下面的规则用 `!important` 强制显示。能压过内联样式的原因：CSS 中
+ * `!important` 的优先级高于内联的非 `!important` 声明。
+ *
+ * 选择器清单与 `app/layout.tsx` 里 `<noscript>` 那份**必须保持一致** ——
+ * 一个管「JS 被禁用」，一个管「减少动态效果」，两者互不覆盖。
+ */
 @media (prefers-reduced-motion: reduce) {
-  .fade-up {
+  .fade-up,
+  .hero-entrance,
+  .hero-title-char,
+  .hero-brush {
     opacity: 1 !important;
     transform: none !important;
+    filter: none !important;
     transition: none !important;
   }
   .animate-ping,
