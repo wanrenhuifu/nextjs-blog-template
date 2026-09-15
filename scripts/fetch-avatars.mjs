@@ -68,5 +68,7 @@ async function fetchAvatars() {
 
 fetchAvatars().catch((err) => {
   console.error('脚本出错:', err.message);
-  process.exit(1);
+  // 不要用 process.exit()：fetch 的句柄可能仍在关闭中，Windows 上会在 libuv 里
+  // 断言崩溃（UV_HANDLE_CLOSING）。设退出码后正常返回即可。
+  process.exitCode = 1;
 });
