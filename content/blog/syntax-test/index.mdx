@@ -1,0 +1,603 @@
+---
+title: "MDX + Markdown 语法测试"
+pubDate: 2026-05-04
+description: "MDX 与 Markdown 语法渲染效果全覆盖测试。"
+tags: ["MDX", "Markdown", "测试"]
+category: 测试
+---
+
+本文覆盖本博客所有已支持的 MDX 扩展能力与标准 Markdown 语法，用于一次性验证渲染效果。若你发现任何显示异常，欢迎在评论区反馈。
+
+---
+
+## 一、MDX 扩展能力
+
+MDX 允许在 Markdown 中直接书写 JavaScript 表达式和 React 组件。
+
+### 1.1 变量插值
+
+这篇文章的作者是：**作者名**。构建日期：2026 年 5 月 4 日。
+
+### 1.2 内联 JSX 组件
+
+<div className="rounded-2xl p-8 my-6 bg-card border border-borderline shadow-lg">
+  <div className="flex flex-col md:flex-row gap-6 items-center">
+    <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center text-3xl shadow-md flex-shrink-0 text-on-primary">
+      🔮
+    </div>
+    <div className="flex-1 text-center md:text-left">
+      <h3 className="text-xl font-bold text-title !mt-0 !mb-2">
+        高级交互式 JSX 卡片
+      </h3>
+      <p className="text-body text-sm !m-0 leading-relaxed">它完全使用 <strong>Tailwind CSS</strong> 编写，直接嵌入在 Markdown 当中！包含响应式布局和语义化 Token，这使得 MDX 完全超越了传统 Markdown 的排版限制。</p>
+    </div>
+    <div className="inline-flex items-center justify-center px-5 py-2.5 bg-primary font-medium rounded-xl hover:bg-primary-hover hover:shadow-lg active:scale-95 transition-all flex-shrink-0 cursor-pointer select-none text-on-primary">
+      交互演示
+    </div>
+  </div>
+</div>
+
+### 1.3 条件渲染与表达式
+
+MDX 支持在 Markdown 中直接书写 IIFE（立即执行函数表达式）：
+
+{(() => {
+  const themeLabel = '日间模式';
+  const features = ['变量插值', '条件渲染', '列表映射', '组件嵌入', '组件组合'];
+  return (
+    <div className="my-4 p-5 rounded-xl bg-card border border-borderline">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="w-2 h-2 rounded-full bg-primary" />
+        <span className="text-sm font-medium text-title">MDX 核心能力（共 {features.length} 项）</span>
+      </div>
+      <ul className="space-y-1.5 list-none pl-0">
+        {features.map((item, i) => (
+          <li key={i} className="flex items-center gap-2 text-sm text-body">
+            <span className="text-primary font-mono text-xs">{String(i + 1).padStart(2, '0')}</span>
+            {item}
+          </li>
+        ))}
+      </ul>
+      <div className="mt-3 pt-3 border-t border-borderline text-xs text-muted">
+        当前渲染模式：<span className="text-primary font-medium">{themeLabel}</span>
+      </div>
+    </div>
+  );
+})()}
+
+### 1.4 列表映射
+
+通过 JavaScript `.map()` 动态渲染标签列表：
+
+<ul className="flex flex-wrap gap-2 list-none pl-0 mt-4">
+  {['MDX', 'Tailwind CSS', 'JSX', 'React', 'next-mdx-remote'].map((tag) => (
+    <li key={tag} className="m-0 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium border border-primary/20">
+      #{tag}
+    </li>
+  ))}
+</ul>
+
+### 1.5 组件组合
+
+MDX 允许在同一文档中自由组合 JSX 片段与 Markdown 内容：
+
+<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
+  {[
+    { icon: '📝', title: 'Markdown 基础', desc: '标题、列表、表格、代码块' },
+    { icon: '⚛️', title: 'JSX 组件', desc: '内联组件、条件渲染、列表映射' },
+    { icon: '📐', title: '数学公式', desc: 'KaTeX 行内与块级渲染' },
+  ].map((card) => (
+    <div key={card.title} className="p-4 rounded-xl bg-card border border-borderline text-center">
+      <div className="text-2xl mb-2">{card.icon}</div>
+      <div className="text-sm font-medium text-title mb-1">{card.title}</div>
+      <div className="text-xs text-muted">{card.desc}</div>
+    </div>
+  ))}
+</div>
+
+---
+
+## 二、基础排版
+
+### 2.1 文本样式
+
+**加粗**，*斜体*，***加粗斜体***，~~删除线~~，<u>下划线</u>，行内代码 `npm run build`，<mark>高亮文本</mark>，<kbd>Ctrl</kbd> + <kbd>K</kbd>。
+
+上标：X<sup>2</sup> + Y<sup>2</sup> = Z<sup>2</sup>；下标：H<sub>2</sub>O。
+
+### 2.2 链接
+
+**行内链接**：[Next.js 官网](https://nextjs.org "Next.js 官网")。
+
+**引用式链接**：[React 文档][react] 推荐使用函数组件。[Tailwind CSS][tailwind] 提供工具类优先的样式方案。
+
+[react]: https://react.dev "React 官方文档"
+[tailwind]: https://tailwindcss.com "Tailwind CSS 官网"
+
+**自动链接**（GFM）：https://github.com 在 GFM 中会自动转为可点击链接。
+
+### 2.3 图片
+
+本地图片引用（图片放在 `public/blog/<slug>/` 下，见 `public/AGENTS.md`）：
+
+<img src="/blog/syntax-test/example.webp" alt="示例配图" className="rounded-lg my-4 max-w-md mx-auto" />
+
+---
+
+## 三、列表
+
+### 3.1 无序列表
+
+- 一级项目
+  - 二级项目 A
+    - 三级项目 —— 更深层级
+  - 二级项目 B
+- 另一个一级项目
+
+### 3.2 有序列表
+
+1. 第一步：安装依赖
+   - `npm install next`
+   - `npm install tailwindcss @tailwindcss/typography`
+2. 第二步：配置项目
+   1. 创建 `next.config.ts`
+   2. 配置 Tailwind 插件
+   3. 设置路径别名 `@/`
+3. 第三步：启动开发服务器
+   - 运行 `npm run dev`
+   - 访问 `http://localhost:3000`
+
+### 3.3 任务列表
+
+- [x] 配置基础环境
+- [x] 完成博客搭建
+- [x] 添加文章目录 TOC
+- [x] 集成 Waline 评论
+- [ ] 撰写更多技术文章
+  - [ ] Next.js App Router 深度解析
+  - [ ] Tailwind CSS v4 迁移指南
+- [ ] 优化移动端体验
+
+---
+
+## 四、表格
+
+### 4.1 对齐表格
+
+| 框架 | 渲染模式 | 静态导出 | 学习曲线 |
+| :--- | :---: | :---: | :--- |
+| **Next.js** | SSR / SSG / ISR | ✅ | 中等 |
+| **Astro** | SSG / SSR | ✅ | 平缓 |
+| **Nuxt** | SSR / SSG | ✅ | 中等 |
+| **Gatsby** | SSG | ❌ | 陡峭 |
+| **Remix** | SSR | 部分 | 中等 |
+
+### 4.2 复杂内容表格
+
+| 功能 | 语法 | 说明 |
+| :--- | :--- | :--- |
+| 行内代码 | `` `const x = 1` `` | 使用反引号包裹 |
+| 链接 | `[文本](url)` | 行内链接语法 |
+| 粗体 | `**文本**` | 双星号包裹 |
+| 管道符转义 | `\|` 或 `&#124;` | 表格中使用需转义 |
+
+---
+
+## 五、代码块
+
+### 5.1 多语言高亮
+
+**TypeScript**：
+
+```typescript
+// 类型安全的博客文章接口
+interface Post {
+  slug: string;
+  title: string;
+  pubDate: string;
+  tags: string[];
+  readingTime: number;
+}
+
+async function getPostBySlug(slug: string): Promise<Post | null> {
+  const raw = await fs.readFile(
+    path.join(process.cwd(), 'content', 'blog', slug, 'index.mdx'),
+    'utf-8'
+  );
+  const { data, content } = matter(raw);
+  return { slug, ...data, readingTime: estimateReadingTime(content) } as Post;
+}
+```
+
+**Rust**：
+
+```rust
+use std::fs;
+use std::path::PathBuf;
+
+#[derive(Debug)]
+struct Post {
+    slug: String,
+    title: String,
+    reading_time: u32,
+}
+
+fn read_posts(dir: PathBuf) -> Vec<Post> {
+    fs::read_dir(dir)
+        .expect("读取目录失败")
+        .filter_map(|entry| {
+            let slug = entry.ok()?.file_name().into_string().ok()?;
+            Some(Post { slug, title: String::new(), reading_time: 0 })
+        })
+        .collect()
+}
+```
+
+**Python**：
+
+```python
+from pathlib import Path
+from dataclasses import dataclass
+from typing import Optional
+import re
+
+@dataclass
+class Post:
+    slug: str
+    title: str
+    reading_time: int
+
+def extract_toc(content: str) -> list[dict]:
+    """从 Markdown 内容提取目录结构"""
+    toc = []
+    for line in content.split('\n'):
+        if match := re.match(r'^(#{2,3})\s+(.+)$', line):
+            toc.append({
+                "level": len(match.group(1)),
+                "text": match.group(2).strip()
+            })
+    return toc
+```
+
+**Go**：
+
+```go
+package main
+
+import (
+    "fmt"
+    "os"
+    "path/filepath"
+)
+
+type Post struct {
+    Slug        string
+    Title       string
+    ReadingTime int
+}
+
+func scanPosts(root string) ([]Post, error) {
+    entries, err := os.ReadDir(root)
+    if err != nil {
+        return nil, fmt.Errorf("扫描目录失败: %w", err)
+    }
+    var posts []Post
+    for _, entry := range entries {
+        if entry.IsDir() {
+            posts = append(posts, Post{Slug: entry.Name()})
+        }
+    }
+    return posts, nil
+}
+```
+
+**Bash**：
+
+```bash
+#!/bin/bash
+# 批量构建脚本
+
+set -euo pipefail
+
+echo "🔨 开始构建…"
+npm run build
+
+if [ $? -eq 0 ]; then
+    echo "✅ 构建成功"
+else
+    echo "❌ 构建失败" >&2
+    exit 1
+fi
+```
+
+**JSON**：
+
+```json
+{
+  "title": "Hello World",
+  "pubDate": "2026-05-04",
+  "tags": ["MDX", "Markdown"],
+  "metadata": {
+    "readingTime": 5,
+    "wordCount": 1200
+  }
+}
+```
+
+**YAML**：
+
+```yaml
+# GitHub Actions 工作流
+name: Deploy
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm run build
+```
+
+### 5.2 代码块元信息
+
+带**标题**的代码块：
+
+```typescript title="lib/mdx.ts"
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+
+export const mdxOptions = {
+  remarkPlugins: [remarkGfm, remarkMath],
+};
+```
+
+带**行号**的代码块：
+
+```python showLineNumbers
+def fibonacci(n: int) -> int:
+    """计算第 n 个斐波那契数"""
+    if n <= 1:
+        return n
+    a, b = 0, 1
+    for _ in range(2, n + 1):
+        a, b = b, a + b
+    return b
+```
+
+带**行号 + 标题**的代码块：
+
+```rust title="src/main.rs" showLineNumbers
+fn main() {
+    println!("Hello, world!");
+
+    let numbers = vec![1, 2, 3, 4, 5];
+    let sum: i32 = numbers.iter().sum();
+
+    println!("Sum: {}", sum);
+}
+```
+
+### 5.3 Diff 代码块
+
+```diff
+// 优化前
+function getPosts() {
+- const data = fs.readFileSync('posts.json', 'utf-8');
+- return JSON.parse(data);
++ const raw = fs.readFileSync('posts.json', 'utf-8');
++ const parsed = JSON.parse(raw);
++ return parsed.filter(post => post.published);
+}
+```
+
+---
+
+## 六、数学公式
+
+### 6.1 行内公式
+
+勾股定理：$a^2 + b^2 = c^2$；圆周率：$\pi \approx 3.14159$；欧拉恒等式：$e^{i\pi} + 1 = 0$。
+
+### 6.2 块级公式
+
+傅里叶变换：
+
+$$
+f(x) = \int_{-\infty}^\infty \hat{f}(\xi)\,e^{2 \pi i \xi x}\,d\xi
+$$
+
+二次方程求根公式：
+
+$$
+x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
+$$
+
+矩阵乘法：
+
+$$
+\begin{pmatrix}
+a & b \\
+c & d
+\end{pmatrix}
+\begin{pmatrix}
+x \\
+y
+\end{pmatrix}
+=
+\begin{pmatrix}
+ax + by \\
+cx + dy
+\end{pmatrix}
+$$
+
+贝叶斯定理：
+
+$$
+P(A \mid B) = \frac{P(B \mid A) \cdot P(A)}{P(B)}
+$$
+
+---
+
+## 七、引用
+
+### 7.1 单层引用
+
+> "竹影扫阶尘不动，月穿潭底水无痕。" —— 这是博客的座右铭，取自一首禅诗。
+
+### 7.2 嵌套引用
+
+> 外层引用内容。
+>
+> > 内层嵌套引用。这一层可以表达补充说明或引申观点。
+> >
+> > > 第三层嵌套 —— 多见于学术论文或深度讨论中的多重转引。
+>
+> 回到外层，继续正文内容。
+
+### 7.3 引用内嵌其他元素
+
+> **引用内的格式化文本**
+>
+> 引用块中可以包含多种 Markdown 元素：
+>
+> - 无序列表项
+> - 另一个列表项
+>
+> 1. 有序列表也可以
+> 2. 在引用中正常使用
+>
+> ```bash
+> # 甚至可以嵌入代码块
+> echo "Hello from blockquote"
+> ```
+>
+> 以及行内代码 `const x = 1` 和[链接](https://example.com)。
+
+---
+
+## 八、脚注与分割线
+
+### 脚注
+
+MDX 是 Markdown 的扩展[^1]，它允许在文档中直接嵌入 JSX 组件[^2]。这个博客使用 `next-mdx-remote` 来编译 MDX 内容[^3]。
+
+[^1]: [MDX 官方文档](https://mdxjs.com) —— A markdown format that lets you use JSX.
+[^2]: [JSX 介绍](https://react.dev/learn/writing-markup-with-jsx) —— React 的 JavaScript 语法扩展。
+[^3]: [next-mdx-remote GitHub](https://github.com/hashicorp/next-mdx-remote) —— 服务端 MDX 编译方案。
+
+### 水平分割线
+
+---
+
+分割线常用于在视觉上分隔不同的内容区块，保持文章的阅读节奏。
+
+---
+
+## 九、HTML 元素兼容性
+
+Markdown 支持直接嵌入原生 HTML 标签，以下测试常用交互与语义元素。
+
+### 9.1 折叠面板
+
+<details>
+<summary><strong>点击展开</strong> —— 查看详细说明</summary>
+
+折叠面板（`<details>` + `<summary>`）非常适合 FAQ、附录、或需要按需显示的长内容。
+
+- 支持内嵌 Markdown 列表
+- 支持**粗体**和*斜体*
+- 支持行内代码 `inline code`
+
+```json
+{ "hidden": true, "message": "这段 JSON 默认折叠" }
+```
+
+</details>
+
+### 9.2 键盘输入
+
+常用快捷键：
+
+| 操作 | 快捷键 |
+| :--- | :--- |
+| 保存文件 | <kbd>Ctrl</kbd> + <kbd>S</kbd> |
+| 查找 | <kbd>Ctrl</kbd> + <kbd>F</kbd> |
+| 命令面板 | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> |
+| 切换注释 | <kbd>Ctrl</kbd> + <kbd>/</kbd> |
+
+### 9.3 高亮与标记
+
+使用 <mark>高亮标记</mark> 强调关键信息，这在引用他人观点或标注修改部分时特别有用。也可以标记 <mark>多个关键词</mark> 在同一段落中。
+
+### 9.4 缩写
+
+<abbr title="HyperText Markup Language">HTML</abbr> 和 <abbr title="Cascading Style Sheets">CSS</abbr> 是网页开发的基础。<abbr title="JavaScript Object Notation">JSON</abbr> 常用于数据交换。
+
+*鼠标悬停在缩写词上可查看完整释义。*
+
+### 9.5 定义列表
+
+<dl>
+  <dt><strong>MDX</strong></dt>
+  <dd>Markdown 的扩展格式，允许在 Markdown 文档中直接嵌入 JSX 组件与 JavaScript 表达式。</dd>
+
+  <dt><strong>GFM</strong></dt>
+  <dd>GitHub Flavored Markdown，GitHub 对标准 Markdown 的扩展，新增了表格、任务列表、删除线、自动链接等语法。</dd>
+
+  <dt><strong>SSG</strong></dt>
+  <dd>Static Site Generation，静态站点生成。在构建时预渲染所有页面为静态 HTML 文件，无需服务端运行时。</dd>
+</dl>
+
+---
+
+## 十、排版边界情况
+
+### 10.1 中英文混排
+
+以下段落密集混合中英文，用于检查字体回退（font fallback）和字距：
+
+React 18 引入了 Concurrent Features，包括 `useTransition` 和 `useDeferredValue` 两个核心 Hook。在 Next.js 15 中，App Router 已经成为推荐的架构模式，它基于 React Server Components（RSC）实现。TypeScript 的 strict 模式开启了 `strictNullChecks`、`noImplicitAny` 等严格检查项。
+
+> 'net/http' 是 Go 语言的标准库 HTTP 包。在 Rust 中对应的 crate 有 `hyper`、`axum` 和 `actix-web`。Python 生态中 FastAPI 凭借其 Starlette + Pydantic 的组合迅速流行。
+
+**中文标点与英文混排**：他说"Hello World！"；她回复"你好，世界！"；代码 `console.log('hello');` 在行内使用。
+
+### 10.2 特殊字符转义
+
+Markdown 中的特殊字符需要用反斜杠转义：
+
+| 字符 | 转义写法 | 渲染结果 |
+| :--- | :--- | :--- |
+| 星号 | `\*` | \*不是斜体\* |
+| 下划线 | `\_` | \_不是斜体\_ |
+| 井号 | `\#` | \# 不是标题 |
+| 反引号 | `` \` `` | \`不是代码\` |
+| 管道符 | `\|` | \| 不是表格列分隔 |
+| 方括号 | `\[` `\]` | \[不是链接\] |
+| 尖括号 | `\<` `\>` | \<不是 HTML\> |
+
+在表格中使用管道符（`|`）作为内容而非列分隔符时，可以使用 HTML 实体 `&#124;` 代替。
+
+### 10.3 超长内容
+
+**超长行内代码**：`const extremelyLongVariableNameThatMakesTheInlineCodeStretchAcrossMultipleLinesOrAtLeastOneVeryLongLineInTheParagraph = someFunctionCall(argument1, argument2, argument3)`
+
+**超长 URL**：https://github.com/vercel/next.js/tree/canary/packages/next/src/shared/lib/router/utils
+
+### 10.4 深度嵌套列表
+
+- 第一层
+  - 第二层
+    - 第三层
+      - 第四层 —— 这一层开始编号样式可能变化
+        - 第五层 —— 极深嵌套，验证渲染不崩溃且视觉仍可辨识
+  - 回到第二层
+- 回到第一层
+
+---
+
+以上十大板块覆盖了本博客目前支持的 MDX 扩展能力与标准 Markdown 语法。如果你发现任何渲染异常，欢迎通过评论区或友链联系方式反馈。

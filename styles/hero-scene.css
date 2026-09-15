@@ -1,0 +1,851 @@
+/* ==========================================================================
+   Hero 背景场景层 —— 内联 SVG 绘制 + CSS 3D 纵深（无图片、无位图素材）
+   消费方：components/home/HeroSection.tsx（BambooScene / StarryScene）
+
+   3D 结构（务必按此层级，踩过坑）：
+     .scene            绝对定位铺满 + overflow:hidden + opacity（由 Framer 驱动日夜淡出）
+     └ .hero-perspective   perspective —— 只负责建立透视
+       └ .hero-space       preserve-3d —— 承载鼠标驱动的 rotateX / rotateY
+         └ .hero-layer     静态 translateZ —— 决定各层纵深
+           └ [motion]      滚动视差 translateY（Framer 内联，不覆盖上面的 Z）
+
+   三个「扁平化陷阱」及此处对策：
+   1. opacity < 1、overflow != visible、filter 都会把元素的 transform-style 强制成 flat。
+      因此 3D 一律下沉到 .hero-perspective 以内：.scene 上的 opacity/overflow 只作用于
+      投影之后的平面结果，互不干扰（页面骨架无需改动）。
+   2. 远景竹竿原本靠 filter: blur() 失焦 —— 会扁平化，且真 3D 本身就有近大远小的
+      透视收缩。已改为「降低墨色浓度 + translateZ 推远」，不再用 blur。
+   3. 斑驳光斑仍需 blur(48px)，故不放进 3D 层，作为 .scene 的直接子元素平铺在最后方。
+
+   颜色一律消费 theme.css 的 --theme-* 变量；循环动画只动 transform / opacity。
+   ========================================================================== */
+
+/* 日夜交叉淡出由 Framer Motion 驱动（内联 opacity，0.9s，reduced-motion 时瞬时）。
+   这里只定义「无 JS / 挂载前」的静态显隐默认值，挂载后由 Framer 内联值覆盖。 */
+.scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* 日间为默认态：静态导出的 HTML 无 data-theme 属性时也能显示竹林场景 */
+.scene-day {
+  opacity: 1;
+}
+[data-theme="dark"] .scene-day {
+  opacity: 0;
+}
+[data-theme="dark"] .scene-night {
+  opacity: 1;
+}
+
+/* ---------- 3D 空间 ---------- */
+
+.hero-perspective {
+  position: absolute;
+  inset: 0;
+  /* 透视略强于真实镜头，让纵深差在小位移下也读得出来；视点稍高于中心 */
+  perspective: 1400px;
+  perspective-origin: 50% 42%;
+}
+
+.hero-space {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* 各层纵深。用静态 transform 而非内联样式：无 JS 时同样有立体感，
+   滚动视差由内层 motion 元素的 translateY 单独负责，不覆盖这里的 Z。 */
+.hero-layer {
+  position: absolute;
+  inset: 0;
+}
+.hero-layer--far {
+  transform: translateZ(-240px);
+}
+.hero-layer--mid {
+  transform: translateZ(-110px);
+}
+.hero-layer--near {
+  transform: translateZ(0);
+}
+/* 最远层：夜间月轮与星野。推得最深，滚动/视角变化时位移最小，读作「很远」 */
+.hero-layer--deep {
+  transform: translateZ(-300px);
+}
+
+/* ---------- 竹子（SVG 元素样式） ---------- */
+
+/* 竹竿：底部锚定，随根部摇曳。origin 在底端，转动幅度与真实竹竿一致地小 */
+.bamboo-stalk {
+  position: absolute;
+  bottom: -4%;
+  height: 108%;
+  transform-origin: 50% 100%;
+  animation: sway 9s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* 竹叶：origin 在叶柄端，随竹竿一起摆 */
+.bamboo-leaf {
+  position: absolute;
+  transform-origin: 0 50%;
+}
+
+/* ---------- 远山：日间淡墨晕染，夜间夜色剪影 + 月光勾边 ---------- */
+
+.mountains {
+  position: absolute;
+  inset-inline: -2%;
+  bottom: 0;
+  width: 104%;
+  /* 压低到画面下三分之一：地平线不该和中央文字抢位置 */
+  height: 34%;
+}
+
+/* ---------- 星河（夜间） ---------- */
+
+.galaxy {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* 必须用遮罩收四边：带内的渐变轴是斜的，左上角与右下角恰好落在轴心、
+     颜色最浓，会沿着 SVG 的直角露出两条硬边（在深远层被透视缩放后尤其明显，
+     看起来像一块居中的方板）。径向遮罩让四个方向一起淡出。 */
+  -webkit-mask-image: radial-gradient(115% 78% at 52% 48%, #000 26%, transparent 76%);
+  mask-image: radial-gradient(115% 78% at 52% 48%, #000 26%, transparent 76%);
+}
+
+/* ---------- 云气：横贯画面的柔光带 ----------
+   它切断了远山与竹林之间的连续视线，眼睛会把「中间隔着一层雾」读成距离，
+   这是最省成本、也最有效的一档纵深信号。用径向渐变而非 blur —— 渐变天生柔和，
+   而 blur 会带来一次栅格化，且在被扁平化的 3D 上下文里行为不总是可预期。 */
+.mist {
+  position: absolute;
+  inset-inline: -10%;
+  pointer-events: none;
+  will-change: transform;
+  animation: mist-drift 34s ease-in-out infinite alternate;
+}
+
+.mist--far {
+  bottom: 26%;
+  height: 22%;
+  background: radial-gradient(
+    58% 100% at 50% 50%,
+    color-mix(in srgb, var(--theme-app) 56%, transparent),
+    transparent 72%
+  );
+}
+
+.mist--mid {
+  bottom: 12%;
+  height: 26%;
+  background: radial-gradient(
+    50% 100% at 44% 50%,
+    color-mix(in srgb, var(--theme-app) 44%, transparent),
+    transparent 74%
+  );
+  animation-duration: 41s;
+  animation-delay: -11s;
+}
+
+.mist--night {
+  bottom: 18%;
+  height: 24%;
+  background: radial-gradient(
+    56% 100% at 50% 50%,
+    color-mix(in srgb, var(--theme-night-glow) 24%, transparent),
+    transparent 72%
+  );
+}
+
+/* ---------- 光柱（日间）：斜穿画面的几束天光 ----------
+   放在 3D 之外 —— 天光是整片大气效果，不该跟着视角一起位移 */
+.rays {
+  position: absolute;
+  inset: -25% -10%;
+  transform: rotate(-17deg);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ray {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  opacity: 0.28;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--theme-dapple-warm) 46%, transparent) 44%,
+    transparent
+  );
+  filter: blur(14px);
+  will-change: transform, opacity;
+  animation: ray-breathe 17s ease-in-out infinite alternate;
+}
+
+.ray-a {
+  left: 16%;
+  width: 5.5%;
+}
+.ray-b {
+  left: 34%;
+  width: 3%;
+  animation-duration: 23s;
+  animation-delay: -6s;
+}
+.ray-c {
+  left: 62%;
+  width: 7%;
+  animation-duration: 29s;
+  animation-delay: -13s;
+}
+
+/* ---------- 飘落的竹叶（日间）：几片脱枝旋落，各不相同的相位 ---------- */
+
+.falling-leaf {
+  position: absolute;
+  top: -8%;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation-name: leaf-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* ---------- 萤火（夜间）：近处漂浮的暖金小点 ---------- */
+
+.firefly {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--theme-moon-hi);
+  box-shadow:
+    0 0 6px 2px color-mix(in srgb, var(--theme-moon-core) 55%, transparent),
+    0 0 18px 6px color-mix(in srgb, var(--theme-moon-core) 22%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation-name: firefly-drift, firefly-blink;
+  animation-timing-function: ease-in-out, ease-in-out;
+  animation-iteration-count: infinite, infinite;
+  animation-direction: alternate, alternate;
+}
+
+/* ---------- 大气层：纸纹 / 渐晕 / 上下缘淡出 ---------- */
+
+/* 宣纸纹理：一张 140×140 的 SVG 噪声平铺，只叠极低的不透明度。
+   用背景平铺而不是把 feTurbulence 铺满整屏 —— 后者每次栅格化都是整屏开销，
+   140px 的小块只栅格化一次。 */
+.hero-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  opacity: 0.04;
+  mix-blend-mode: multiply;
+}
+
+[data-theme="dark"] .hero-grain {
+  opacity: 0.05;
+  /* 暗底上 multiply 只会更黑，改用 overlay 让颗粒浮出来，像胶片颗粒 */
+  mix-blend-mode: overlay;
+}
+
+/* 渐晕：把注意力收到画面中心 */
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    125% 95% at 50% 46%,
+    transparent 42%,
+    var(--theme-vignette) 100%
+  );
+}
+
+/* 上下缘淡出：让 Hero 与页面底色无缝衔接，避免出现一条硬边 */
+.hero-fade {
+  position: absolute;
+  inset-inline: 0;
+  pointer-events: none;
+}
+
+.hero-fade--top {
+  top: 0;
+  height: 14%;
+  background: linear-gradient(to bottom, var(--theme-app), transparent);
+}
+
+.hero-fade--bottom {
+  bottom: 0;
+  height: 22%;
+  background: linear-gradient(to top, var(--theme-app), transparent);
+}
+
+/* ---------- 标题 ---------- */
+
+.hero-title {
+  font-family: var(--font-serif);
+  /* 4 字横排，上限 6rem（96px）—— 再大就压过整屏、抢了场景的戏 */
+  font-size: clamp(2.5rem, 6.5vw, 6rem);
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: 0.04em;
+  color: var(--theme-title);
+  /* 极淡的下压阴影，让字像落在纸上而不是浮在屏幕上 */
+  text-shadow: 0 1px 0 color-mix(in srgb, var(--theme-title) 7%, transparent);
+}
+
+.hero-title-char {
+  display: inline-block;
+  will-change: transform, filter;
+}
+
+/* 笔锋：一道两端尖的短横，替代原来的分隔细线。做细 —— 它是笔意，不是色块 */
+.hero-brush {
+  display: block;
+  width: 148px;
+  height: 6px;
+}
+
+.hero-brush svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- 入口按钮 ---------- */
+
+.hero-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.875rem; /* 46px，满足触控目标 */
+  padding: 0 1.6rem;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  font-family: var(--font-serif);
+  font-size: 0.9375rem;
+  letter-spacing: 0.14em;
+  overflow: hidden;
+  /* 让 ::before 的填充只在这一层内混合，不外溢到背景 */
+  isolation: isolate;
+  transition:
+    color 0.4s ease,
+    border-color 0.4s ease,
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.45s ease;
+}
+
+.hero-cta > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* 字距会在末字后也留一份空隙，抵掉它文字才视觉居中 */
+.hero-cta > span {
+  margin-right: -0.14em;
+}
+
+/* 填充自左向右扫入 */
+.hero-cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--theme-primary);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-cta:hover::before,
+.hero-cta:focus-visible::before {
+  transform: scaleX(1);
+}
+
+.hero-cta:hover {
+  transform: translateY(-2px);
+}
+
+.hero-cta--primary {
+  border-color: var(--theme-primary);
+  color: var(--theme-primary);
+}
+
+.hero-cta--primary:hover,
+.hero-cta--primary:focus-visible {
+  color: var(--theme-on-primary);
+  box-shadow: 0 10px 26px -10px color-mix(in srgb, var(--theme-primary) 55%, transparent);
+}
+
+.hero-cta--ghost {
+  border-color: var(--theme-borderline);
+  color: var(--theme-body);
+}
+
+.hero-cta--ghost::before {
+  background: color-mix(in srgb, var(--theme-primary) 12%, transparent);
+}
+
+.hero-cta--ghost:hover,
+.hero-cta--ghost:focus-visible {
+  border-color: var(--theme-primary);
+  color: var(--theme-primary);
+}
+
+.hero-cta__arrow {
+  width: 1rem;
+  height: 1rem;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-cta:hover .hero-cta__arrow {
+  transform: translateX(4px);
+}
+
+/* ---------- 滚动提示：一道反复向下生长的细线 ---------- */
+
+.scroll-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.scroll-hint__label {
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  color: var(--theme-muted);
+}
+
+.scroll-hint__line {
+  position: relative;
+  width: 1px;
+  height: 52px;
+  overflow: hidden;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--theme-borderline) 90%, transparent),
+    transparent
+  );
+}
+
+.scroll-hint__line::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 42%;
+  background: var(--theme-primary);
+  animation: scroll-trace 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+/* ---------- 斑驳光影（日间）：平铺在 3D 层之后的柔焦光斑 ---------- */
+.dapple {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(48px);
+  will-change: transform;
+  animation: dapple-drift 18s ease-in-out infinite alternate;
+}
+
+.dapple-a {
+  width: 48vmax;
+  height: 48vmax;
+  left: -10%;
+  top: -12%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--theme-primary) 8%, transparent),
+    transparent 64%
+  );
+}
+
+.dapple-b {
+  width: 40vmax;
+  height: 40vmax;
+  right: -8%;
+  bottom: -14%;
+  /* 压得比 dapple-a 低很多：暖光斑与远山、云气叠在同一带，
+     三者都实就会混出一片灰褐色的浊区，失掉宣纸该有的干净 */
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--theme-dapple-warm) 22%, transparent),
+    transparent 62%
+  );
+  animation-duration: 23s;
+}
+
+/* ---------- 浮尘微粒（日间） ---------- */
+
+.dust {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: transparent;
+  color: color-mix(in srgb, var(--theme-dust) 60%, transparent);
+  will-change: transform, opacity;
+  animation: dust-drift 24s linear infinite;
+}
+
+.dust-a {
+  box-shadow:
+    9vw 82vh 0 0 currentColor, 16vw 64vh 0 0 currentColor, 23vw 90vh 0 0 currentColor,
+    31vw 58vh 0 0 currentColor, 38vw 76vh 0 0 currentColor, 47vw 88vh 0 0 currentColor,
+    55vw 62vh 0 0 currentColor, 63vw 84vh 0 0 currentColor, 71vw 70vh 0 0 currentColor,
+    80vw 92vh 0 0 currentColor, 88vw 60vh 0 0 currentColor;
+}
+
+.dust-b {
+  width: 2px;
+  height: 2px;
+  box-shadow:
+    13vw 70vh 0 0 currentColor, 27vw 86vh 0 0 currentColor, 42vw 66vh 0 0 currentColor,
+    58vw 90vh 0 0 currentColor, 74vw 74vh 0 0 currentColor, 91vw 84vh 0 0 currentColor;
+  animation-duration: 31s;
+  animation-delay: -9s;
+}
+
+.dust-c {
+  width: 2px;
+  height: 2px;
+  box-shadow:
+    20vw 78vh 0 0 currentColor, 35vw 94vh 0 0 currentColor, 51vw 72vh 0 0 currentColor,
+    67vw 86vh 0 0 currentColor, 84vw 68vh 0 0 currentColor;
+  animation-duration: 37s;
+  animation-delay: -19s;
+}
+
+/* ---------- 夜间场景：金色月轮 + 多层光晕 · 稀疏星点 ---------- */
+
+/* 夜空顶部的微弱环境光，让夜色不是一块死黑 */
+.scene-night::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    115% 85% at 76% 10%,
+    color-mix(in srgb, var(--theme-night-glow) 30%, transparent),
+    transparent 58%
+  );
+}
+
+/* 月轮：径向渐变塑出球面明暗，box-shadow 叠三层径向光晕。
+   right 已按 Z=-300 的透视收缩量补偿（不补会向画面中心收拢约 100px）。 */
+.moon {
+  position: absolute;
+  top: 15%;
+  right: 7%;
+  width: clamp(88px, 13vw, 148px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 38% 33%,
+    var(--theme-moon-hi) 0%,
+    var(--theme-moon-mid) 42%,
+    var(--theme-moon-core) 68%,
+    var(--theme-moon-edge) 100%
+  );
+  box-shadow:
+    0 0 34px 8px color-mix(in srgb, var(--theme-moon-core) 30%, transparent),
+    0 0 90px 28px color-mix(in srgb, var(--theme-moon-core) 17%, transparent),
+    0 0 170px 72px color-mix(in srgb, var(--theme-moon-core) 9%, transparent);
+}
+
+/* 月面浅斑，点到为止 */
+.moon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle at 63% 58%,
+      color-mix(in srgb, var(--theme-moon-spot) 16%, transparent) 0 8%,
+      transparent 13%
+    ),
+    radial-gradient(
+      circle at 44% 70%,
+      color-mix(in srgb, var(--theme-moon-spot) 12%, transparent) 0 5%,
+      transparent 9%
+    );
+}
+
+/* 月轮外两圈同心光环，缓慢呼吸 */
+.moon-halo {
+  position: absolute;
+  inset: -36%;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--theme-moon-core) 14%, transparent);
+  animation: halo-breathe 7s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+.moon-halo--outer {
+  inset: -70%;
+  border-color: color-mix(in srgb, var(--theme-moon-core) 7%, transparent);
+  animation-duration: 9.5s;
+  animation-delay: -3s;
+}
+
+/* 星点：两层 box-shadow 星野，稀疏分布，各自以不同周期明灭 */
+.stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  background: transparent;
+  will-change: opacity;
+  animation: twinkle 5s ease-in-out infinite;
+}
+
+.stars-a {
+  width: 2px;
+  height: 2px;
+  color: var(--theme-star);
+  box-shadow:
+    6vw 14vh 0 0 currentColor, 14vw 32vh 0 0 currentColor, 22vw 10vh 0 0 currentColor,
+    30vw 26vh 0 0 currentColor, 37vw 8vh 0 0 currentColor, 45vw 40vh 0 0 currentColor,
+    52vw 18vh 0 0 currentColor, 58vw 55vh 0 0 currentColor, 63vw 30vh 0 0 currentColor,
+    70vw 66vh 0 0 currentColor, 85vw 44vh 0 0 currentColor, 92vw 20vh 0 0 currentColor,
+    11vw 58vh 0 0 currentColor, 27vw 74vh 0 0 currentColor, 48vw 82vh 0 0 currentColor,
+    88vw 78vh 0 0 currentColor;
+}
+
+.stars-b {
+  width: 1px;
+  height: 1px;
+  color: var(--theme-star-gold); /* 淡金星点，与月轮呼应 */
+  box-shadow:
+    10vw 22vh 0 0 currentColor, 19vw 46vh 0 0 currentColor, 34vw 16vh 0 0 currentColor,
+    42vw 62vh 0 0 currentColor, 55vw 8vh 0 0 currentColor, 66vw 48vh 0 0 currentColor,
+    76vw 26vh 0 0 currentColor, 90vw 58vh 0 0 currentColor, 24vw 88vh 0 0 currentColor,
+    60vw 88vh 0 0 currentColor, 81vw 12vh 0 0 currentColor;
+  animation-duration: 7s;
+  animation-delay: -2.5s;
+}
+
+/* ---------- 关键帧：全部为 transform / opacity，不触碰布局属性 ---------- */
+
+@keyframes mist-drift {
+  from {
+    transform: translate3d(-2.5%, 0, 0) scaleY(1);
+  }
+  to {
+    transform: translate3d(2.5%, 0, 0) scaleY(1.08);
+  }
+}
+
+@keyframes ray-breathe {
+  from {
+    opacity: 0.14;
+    transform: translateX(-2%);
+  }
+  to {
+    opacity: 0.45;
+    transform: translateX(2%);
+  }
+}
+
+@keyframes leaf-fall {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(var(--leaf-scale, 1));
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.6;
+  }
+  85% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: translate3d(var(--drift, 4vw), 118vh, 0) rotate(340deg) scale(var(--leaf-scale, 1));
+    opacity: 0;
+  }
+}
+
+@keyframes firefly-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(2.2rem, -3.4rem, 0);
+  }
+}
+
+@keyframes firefly-blink {
+  from {
+    opacity: 0.1;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scroll-trace {
+  0% {
+    transform: translateY(-110%);
+  }
+  55% {
+    transform: translateY(240%);
+  }
+  100% {
+    transform: translateY(240%);
+  }
+}
+
+@keyframes sway {
+  from {
+    transform: rotate(-1.1deg);
+  }
+  to {
+    transform: rotate(1.1deg);
+  }
+}
+
+@keyframes dapple-drift {
+  from {
+    transform: translate3d(-2.5%, -2%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(2.5%, 2%, 0) scale(1.05);
+  }
+}
+
+@keyframes dust-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.75;
+  }
+  78% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: translate3d(1.2rem, -42vh, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes halo-breathe {
+  from {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(1.045);
+    opacity: 0.9;
+  }
+}
+
+/* ---------- 移动端：避免竹叶扫过中央文字区 ----------
+   中景竿是「在画面内收头挂叶」的那一根，其叶簇按几何计算正好落在标语高度
+   （竿 bottom:-4% + height:58% → 顶端在画面 46%，叶簇 48%–55%；标语在 53%）。
+   桌面上它在 x≈144px、正文自 336px 起所以不冲突，窄屏则直接压上去 —— 隐去。 */
+@media (max-width: 640px) {
+  .hero-layer--mid {
+    display: none;
+  }
+
+  /* 远景收近一档，减少纵深位移幅度 */
+  .hero-layer--far {
+    transform: translateZ(-160px);
+  }
+
+  .moon {
+    top: 11%;
+    right: 9%;
+  }
+
+  /* 窄屏留白少，远山压低、云气减弱，避免把文字围住 */
+  .mountains {
+    height: 34%;
+  }
+
+  .mist--far,
+  .mist--mid {
+    opacity: 0.7;
+  }
+
+  /* 光柱在窄屏上容易变成一片糊白 */
+  .rays {
+    opacity: 0.6;
+  }
+}
+
+/* ---------- 降级 1：不支持 preserve-3d 时退回平面分层 ----------
+   去掉纵深后仍有完整场景，只是没有立体感；各层保持原样叠加即可。 */
+@supports not (transform-style: preserve-3d) {
+  .hero-layer--far,
+  .hero-layer--mid {
+    transform: none;
+  }
+}
+
+/* ---------- 降级 2：prefers-reduced-motion 关闭全部循环动画 ----------
+   置于文件末尾，靠层叠覆盖前文的 animation 声明，无需 !important */
+@media (prefers-reduced-motion: reduce) {
+  .bamboo-stalk,
+  .dapple,
+  .dust,
+  .stars,
+  .moon-halo,
+  .mist,
+  .ray,
+  .falling-leaf,
+  .firefly,
+  .scroll-hint__line::after {
+    animation: none;
+  }
+
+  /* 降级时让这些元素保持静态可见，而不是停在透明帧 */
+  .stars {
+    opacity: 0.85;
+  }
+
+  .dust {
+    opacity: 0.5;
+  }
+
+  .firefly {
+    opacity: 0.55;
+  }
+
+  .scroll-hint__line::after {
+    transform: translateY(60%);
+    opacity: 0.7;
+  }
+
+  /* 落下的叶子在静止状态下没有意义，不如不留 */
+  .falling-leaf {
+    display: none;
+  }
+}

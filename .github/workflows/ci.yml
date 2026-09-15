@@ -1,0 +1,42 @@
+name: CI
+
+# 只做检查，不部署。deploy.yml 负责 main 分支的部署。
+#
+# 为什么需要这个：deploy.yml 只在 push 到 main 时触发 —— 合并之后才发现 lint / 类型 /
+# 构建失败，问题已经落到主干上。本工作流在 PR 上先跑一遍同一组检查。
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          # Next 16 要求 Node >= 20.9（见 package.json 的 engines）
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Test
+        run: npm test
+
+      # 构建不依赖任何环境变量与密钥（见 .env.example）：缺配置时各步骤会跳过或降级，
+      # 所以这里可以直接跑。它主要用来提前发现 MDX 语法错误 —— 那是本仓库最常见的
+      # 构建失败原因，且只有在 next build 阶段才会暴露。
+      - name: Build
+        run: npm run build:verify

@@ -1,0 +1,115 @@
+/* ========== 打印样式优化 ========== */
+
+@media print {
+  /* 基础：白底黑字，去除动画和阴影 */
+  html {
+    scroll-behavior: auto;
+  }
+  body {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    transition: none !important;
+  }
+
+  /* 隐藏不必要的交互元素。
+     data-print-hide 是组件侧的统一钩子（滚动进度条、回到顶部、搜索弹窗等），
+     加它是因为这些组件的根元素没有稳定类名可依，靠类名选择器会失效。 */
+  .scene,
+  #scroll-hint,
+  #theme-toggle,
+  [data-print-hide],
+  .code-block-wrapper button,
+  .wl-container {
+    display: none !important;
+  }
+
+  /* 链接显示 URL */
+  a[href]::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.85em;
+    color: #555;
+    word-break: break-all;
+  }
+  a[href^="/"]::after,
+  a[href^="#"]::after {
+    content: none;
+  }
+
+  /* 代码块变浅背景 */
+  .prose pre,
+  pre {
+    background: #F5F5F5 !important;
+    border: 1px solid #DDD !important;
+    color: #333 !important;
+  }
+  .prose :not(pre) > code {
+    background: #F0F0F0 !important;
+    color: #333 !important;
+    border-color: #DDD !important;
+  }
+
+  /* 确保内容可见 */
+  .prose * {
+    color: #000 !important;
+    border-color: #CCC !important;
+  }
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4,
+  .prose h5,
+  .prose h6 {
+    color: #000 !important;
+    page-break-after: avoid;
+  }
+  .prose blockquote {
+    border-left-color: #999 !important;
+    color: #333 !important;
+  }
+
+  /* 表格优化 */
+  .prose table {
+    display: table;
+    white-space: normal;
+  }
+  .prose th,
+  .prose td {
+    border: 1px solid #CCC !important;
+    padding: 0.5rem;
+  }
+
+  /* 防止元素被分页截断 */
+  pre,
+  img,
+  svg,
+  table,
+  figure,
+  blockquote {
+    page-break-inside: avoid;
+  }
+
+  /* 卡片和布局扁平化。收窄到 bg-card：原先的 [class*="bg-"] 会连 bg-primary
+     这类按钮底色一起刷白，把主色按钮印成空白框。 */
+  .concept-card,
+  [class*="bg-card"] {
+    background: #FFFFFF !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* 导航栏隐藏 */
+  header,
+  nav {
+    display: none !important;
+  }
+
+  /* 页脚简化 */
+  footer {
+    border-top: 1px solid #CCC;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    font-size: 0.85rem;
+    color: #555 !important;
+  }
+}

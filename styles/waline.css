@@ -1,0 +1,41 @@
+/* ========== Waline 评论配色覆盖 ========== */
+/* 映射到项目双主题 Design Token，自动跟随 [data-theme] 切换 */
+
+:root {
+  /* 品牌色 */
+  --waline-theme-color: var(--theme-primary);
+  --waline-active-color: var(--theme-primary-hover);
+
+  /* 表面与文本 */
+  --waline-bg-color: var(--theme-card);
+  --waline-bg-color-light: var(--theme-hover);
+  --waline-bg-color-hover: var(--theme-hover);
+  --waline-color: var(--theme-body);
+  --waline-white: var(--theme-card);
+
+  /* 边框 */
+  --waline-border-color: var(--theme-borderline);
+
+  /* 次要文本 */
+  --waline-light-grey: var(--theme-muted);
+  --waline-dark-grey: var(--theme-body);
+
+  /* 徽章与信息 */
+  --waline-badge-color: var(--theme-info);
+  --waline-info-bg-color: var(--theme-hover);
+  --waline-info-color: var(--theme-muted);
+
+  /* 代码 */
+  --waline-code-bg-color: var(--theme-code-bg);
+
+  /* 引用 */
+  --waline-bq-color: var(--theme-hover);
+
+  /* 禁用态 */
+  --waline-disable-bg-color: var(--theme-hover);
+  --waline-disable-color: var(--theme-muted);
+
+  /* 警告 */
+  --waline-warning-color: var(--theme-warning);
+  --waline-warning-bg-color: color-mix(in srgb, var(--theme-warning) 14%, transparent);
+}

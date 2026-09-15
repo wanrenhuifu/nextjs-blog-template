@@ -1,0 +1,762 @@
+{
+  "source": "LMArena (Chatbot Arena)",
+  "sourceUrl": "https://arena.ai/leaderboard",
+  "updatedAt": "2026-09-15",
+  "description": "基于匿名人类偏好的大语言模型对战排行榜，数据来源为 LMArena 官方榜单。",
+  "leaderboards": [
+    {
+      "slug": "text",
+      "category": "文本总榜",
+      "arenaSlug": "text",
+      "description": "文本总榜排行榜，展示当前领域表现最优的 AI 模型。",
+      "items": [
+        {
+          "rank": 1,
+          "model": "claude-fable-5",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 2,
+          "model": "claude-opus-4-6-high",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 3,
+          "model": "claude-opus-4-7-high",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 4,
+          "model": "muse-spark-1.2 (xHigh)",
+          "org": "Meta"
+        },
+        {
+          "rank": 5,
+          "model": "claude-fable-5.1-max",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 6,
+          "model": "claude-opus-4-6",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 7,
+          "model": "claude-opus-4-7",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 8,
+          "model": "muse-spark-1.3-max",
+          "org": "Meta"
+        },
+        {
+          "rank": 9,
+          "model": "gemini-3.8-flash-high",
+          "org": "Google"
+        },
+        {
+          "rank": 10,
+          "model": "claude-opus-5-high",
+          "org": "Anthropic"
+        }
+      ]
+    },
+    {
+      "slug": "vision",
+      "category": "视觉",
+      "arenaSlug": "vision",
+      "description": "视觉排行榜，展示当前领域表现最优的 AI 模型。",
+      "items": [
+        {
+          "rank": 1,
+          "model": "claude-fable-5",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 2,
+          "model": "qwen3.8-max",
+          "org": "Alibaba"
+        },
+        {
+          "rank": 3,
+          "model": "claude-opus-4-7-high",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 4,
+          "model": "claude-opus-4-7",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 5,
+          "model": "claude-opus-4-6-high",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 6,
+          "model": "muse-spark-1.3-max",
+          "org": "Meta"
+        },
+        {
+          "rank": 7,
+          "model": "muse-spark",
+          "org": "Meta"
+        },
+        {
+          "rank": 8,
+          "model": "claude-opus-4-6",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 9,
+          "model": "muse-spark-1.2 (xHigh)",
+          "org": "Meta"
+        },
+        {
+          "rank": 10,
+          "model": "claude-opus-5-high",
+          "org": "Anthropic"
+        }
+      ]
+    },
+    {
+      "slug": "document",
+      "category": "文档",
+      "arenaSlug": "document",
+      "description": "文档排行榜，展示当前领域表现最优的 AI 模型。",
+      "items": [
+        {
+          "rank": 1,
+          "model": "claude-opus-5-high",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 2,
+          "model": "claude-fable-5.1-max",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 3,
+          "model": "claude-opus-4-6-high",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 4,
+          "model": "claude-opus-4-6",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 5,
+          "model": "claude-fable-5",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 6,
+          "model": "claude-opus-4-7",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 7,
+          "model": "claude-opus-4-7-high",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 8,
+          "model": "gpt-5.5",
+          "org": "OpenAI"
+        },
+        {
+          "rank": 9,
+          "model": "gpt-5.5-high",
+          "org": "OpenAI"
+        },
+        {
+          "rank": 10,
+          "model": "gpt-5.6-sol-xhigh",
+          "org": "OpenAI"
+        }
+      ]
+    },
+    {
+      "slug": "text-to-image",
+      "category": "文生图总榜",
+      "arenaSlug": "text-to-image",
+      "description": "文生图总榜排行榜，展示当前领域表现最优的 AI 模型。",
+      "items": [
+        {
+          "rank": 1,
+          "model": "gpt-image-2.5-sunburst",
+          "org": "OpenAI"
+        },
+        {
+          "rank": 2,
+          "model": "gpt-image-2.5-flare",
+          "org": "OpenAI"
+        },
+        {
+          "rank": 3,
+          "model": "gpt-image-2 (medium)",
+          "org": "OpenAI"
+        },
+        {
+          "rank": 4,
+          "model": "mai-image-2.6",
+          "org": "Microsoft AI"
+        },
+        {
+          "rank": 5,
+          "model": "grok-imagine-image-2.0 (low)",
+          "org": "SpaceXAI"
+        },
+        {
+          "rank": 6,
+          "model": "reve-2.1",
+          "org": "Reve"
+        },
+        {
+          "rank": 7,
+          "model": "muse-image",
+          "org": "Meta"
+        },
+        {
+          "rank": 8,
+          "model": "reve-2.0",
+          "org": "Reve"
+        },
+        {
+          "rank": 9,
+          "model": "gemini-3.1-flash-image (nano-banana-2) [web-search]",
+          "org": "Google"
+        },
+        {
+          "rank": 10,
+          "model": "seedream-5.0-pro",
+          "org": "Bytedance"
+        }
+      ]
+    },
+    {
+      "slug": "image-edit",
+      "category": "图像编辑",
+      "arenaSlug": "image-edit",
+      "description": "图像编辑排行榜，展示当前领域表现最优的 AI 模型。",
+      "items": [
+        {
+          "rank": 1,
+          "model": "gpt-image-2.5-sunburst",
+          "org": "OpenAI"
+        },
+        {
+          "rank": 2,
+          "model": "gpt-image-2.5-flare",
+          "org": "OpenAI"
+        },
+        {
+          "rank": 3,
+          "model": "gpt-image-2 (medium)",
+          "org": "OpenAI"
+        },
+        {
+          "rank": 4,
+          "model": "grok-imagine-image-2.0 (low)",
+          "org": "SpaceXAI"
+        },
+        {
+          "rank": 5,
+          "model": "mai-image-2.6",
+          "org": "Microsoft AI"
+        },
+        {
+          "rank": 6,
+          "model": "muse-image",
+          "org": "Meta"
+        },
+        {
+          "rank": 7,
+          "model": "mai-image-2.5",
+          "org": "Microsoft AI"
+        },
+        {
+          "rank": 8,
+          "model": "seedream-5.0-pro",
+          "org": "Bytedance"
+        },
+        {
+          "rank": 9,
+          "model": "gemini-3-pro-image-2k (nano-banana-pro)",
+          "org": "Google"
+        },
+        {
+          "rank": 10,
+          "model": "grok-imagine-image-quality (20260519)",
+          "org": "SpaceXAI"
+        }
+      ]
+    },
+    {
+      "slug": "image-to-code",
+      "category": "图生代码",
+      "arenaSlug": "image-to-code",
+      "description": "图生代码排行榜，展示当前领域表现最优的 AI 模型。",
+      "items": [
+        {
+          "rank": 1,
+          "model": "gpt-6-astra-max",
+          "org": "OpenAI"
+        },
+        {
+          "rank": 2,
+          "model": "claude-fable-5.1-max",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 3,
+          "model": "claude-opus-5-max",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 4,
+          "model": "muse-spark-1.3-max",
+          "org": "Meta"
+        },
+        {
+          "rank": 5,
+          "model": "qwen3.8-max-0902",
+          "org": "Alibaba"
+        },
+        {
+          "rank": 6,
+          "model": "claude-fable-5",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 7,
+          "model": "qwen3.8-max",
+          "org": "Alibaba"
+        },
+        {
+          "rank": 8,
+          "model": "gpt-5.6-sol-xhigh (codex-harness)",
+          "org": "OpenAI"
+        },
+        {
+          "rank": 9,
+          "model": "grok-4.6-high",
+          "org": "SpaceXAI"
+        },
+        {
+          "rank": 10,
+          "model": "glm-5.3-flash",
+          "org": "Z.ai"
+        }
+      ]
+    },
+    {
+      "slug": "search",
+      "category": "搜索",
+      "arenaSlug": "search",
+      "description": "搜索排行榜，展示当前领域表现最优的 AI 模型。",
+      "items": [
+        {
+          "rank": 1,
+          "model": "gpt-5.6-sol-xhigh",
+          "org": "OpenAI"
+        },
+        {
+          "rank": 2,
+          "model": "claude-opus-4-6-search",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 3,
+          "model": "gpt-5.5-search",
+          "org": "OpenAI"
+        },
+        {
+          "rank": 4,
+          "model": "claude-opus-4-7",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 5,
+          "model": "claude-fable-5",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 6,
+          "model": "ernie-5.1",
+          "org": "Baidu"
+        },
+        {
+          "rank": 7,
+          "model": "claude-sonnet-4-6-search",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 8,
+          "model": "grok-4.5",
+          "org": "SpaceXAI"
+        },
+        {
+          "rank": 9,
+          "model": "gemini-3.1-pro-grounding",
+          "org": "Google"
+        },
+        {
+          "rank": 10,
+          "model": "gemini-3-pro-grounding",
+          "org": "Google"
+        }
+      ]
+    },
+    {
+      "slug": "text-to-video",
+      "category": "文生视频总榜",
+      "arenaSlug": "text-to-video",
+      "description": "文生视频总榜排行榜，展示当前领域表现最优的 AI 模型。",
+      "items": [
+        {
+          "rank": 1,
+          "model": "gemini-omni-1.1-flash",
+          "org": "Google"
+        },
+        {
+          "rank": 2,
+          "model": "gemini-omni-flash",
+          "org": "Google"
+        },
+        {
+          "rank": 3,
+          "model": "wan3.0",
+          "org": "Alibaba"
+        },
+        {
+          "rank": 4,
+          "model": "flux-3-video",
+          "org": "Black Forest Labs"
+        },
+        {
+          "rank": 5,
+          "model": "grok-imagine-video-1.5-agent",
+          "org": "SpaceXAI"
+        },
+        {
+          "rank": 6,
+          "model": "dreamina-seedance-2.5-720p",
+          "org": "Bytedance"
+        },
+        {
+          "rank": 7,
+          "model": "dreamina-seedance-2.0-720p",
+          "org": "Bytedance"
+        },
+        {
+          "rank": 8,
+          "model": "minimax-h3",
+          "org": "MiniMax"
+        },
+        {
+          "rank": 9,
+          "model": "muse-video",
+          "org": "Meta"
+        },
+        {
+          "rank": 10,
+          "model": "happyhorse-1.0",
+          "org": "Alibaba-ATH"
+        }
+      ]
+    },
+    {
+      "slug": "image-to-video",
+      "category": "图生视频",
+      "arenaSlug": "image-to-video",
+      "description": "图生视频排行榜，展示当前领域表现最优的 AI 模型。",
+      "items": [
+        {
+          "rank": 1,
+          "model": "minimax-h3",
+          "org": "MiniMax"
+        },
+        {
+          "rank": 2,
+          "model": "gemini-omni-1.1-flash",
+          "org": "Google"
+        },
+        {
+          "rank": 3,
+          "model": "wan3.0",
+          "org": "Alibaba"
+        },
+        {
+          "rank": 4,
+          "model": "dreamina-seedance-2.5-720p",
+          "org": "Bytedance"
+        },
+        {
+          "rank": 5,
+          "model": "dreamina-seedance-2.0-720p",
+          "org": "Bytedance"
+        },
+        {
+          "rank": 6,
+          "model": "gemini-omni-flash",
+          "org": "Google"
+        },
+        {
+          "rank": 7,
+          "model": "grok-imagine-video-1.5-720p",
+          "org": "SpaceXAI"
+        },
+        {
+          "rank": 8,
+          "model": "hidream-o1-video-1.0",
+          "org": "HiDream"
+        },
+        {
+          "rank": 9,
+          "model": "flux-3-video-20260811",
+          "org": "Black Forest Labs"
+        },
+        {
+          "rank": 10,
+          "model": "happyhorse-1.0",
+          "org": "Alibaba-ATH"
+        }
+      ]
+    },
+    {
+      "slug": "video-to-video",
+      "category": "总体",
+      "arenaSlug": "video-to-video",
+      "description": "总体排行榜，展示当前领域表现最优的 AI 模型。",
+      "items": [
+        {
+          "rank": 1,
+          "model": "wan3.0",
+          "org": "Alibaba"
+        },
+        {
+          "rank": 2,
+          "model": "dreamina-seedance-2.5-720p",
+          "org": "Bytedance"
+        },
+        {
+          "rank": 3,
+          "model": "minimax-h3",
+          "org": "MiniMax"
+        },
+        {
+          "rank": 4,
+          "model": "gemini-omni-flash",
+          "org": "Google"
+        },
+        {
+          "rank": 5,
+          "model": "dreamina-seedance-2.0-720p",
+          "org": "Bytedance"
+        },
+        {
+          "rank": 6,
+          "model": "happyhorse-1.0",
+          "org": "Alibaba-ATH"
+        },
+        {
+          "rank": 7,
+          "model": "grok-imagine-video",
+          "org": "SpaceXAI"
+        },
+        {
+          "rank": 8,
+          "model": "kling-o3-pro",
+          "org": "KlingAI"
+        },
+        {
+          "rank": 9,
+          "model": "kling-o1-pro",
+          "org": "KlingAI"
+        },
+        {
+          "rank": 10,
+          "model": "runway-gen4-aleph",
+          "org": "Runway"
+        }
+      ]
+    },
+    {
+      "slug": "agent",
+      "category": "Agent",
+      "arenaSlug": "agent",
+      "description": "Agent排行榜，展示当前领域表现最优的 AI 模型。",
+      "items": [
+        {
+          "rank": 1,
+          "model": "Claude Fable 5.1 (Max)",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 2,
+          "model": "GPT 6 Astra (Max)",
+          "org": "OpenAI"
+        },
+        {
+          "rank": 3,
+          "model": "Claude Opus 5 (Max)",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 4,
+          "model": "Claude Opus 5 (High)",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 5,
+          "model": "Claude Fable 5 (High)",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 6,
+          "model": "Claude Opus 4.8 (High)",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 7,
+          "model": "GPT 5.6 Sol (xHigh)",
+          "org": "OpenAI"
+        },
+        {
+          "rank": 8,
+          "model": "Kimi K3 (Max)",
+          "org": "Moonshot"
+        },
+        {
+          "rank": 9,
+          "model": "Claude Sonnet 5 (High)",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 10,
+          "model": "GPT 5.5 (xHigh)",
+          "org": "OpenAI"
+        }
+      ]
+    },
+    {
+      "slug": "code/webdev",
+      "category": "WebDev",
+      "arenaSlug": "code/webdev",
+      "description": "WebDev排行榜，展示当前领域表现最优的 AI 模型。",
+      "items": [
+        {
+          "rank": 1,
+          "model": "gpt-6-astra-max",
+          "org": "OpenAI"
+        },
+        {
+          "rank": 2,
+          "model": "claude-fable-5.1-max",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 3,
+          "model": "claude-opus-5-max",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 4,
+          "model": "qwen3.8-max-0902",
+          "org": "Alibaba"
+        },
+        {
+          "rank": 5,
+          "model": "kimi-k3-max",
+          "org": "Moonshot"
+        },
+        {
+          "rank": 6,
+          "model": "qwen3.8-max",
+          "org": "Alibaba"
+        },
+        {
+          "rank": 7,
+          "model": "claude-opus-5-high",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 8,
+          "model": "muse-spark-1.3-max",
+          "org": "Meta"
+        },
+        {
+          "rank": 9,
+          "model": "qwen3.8-flash-next",
+          "org": "Alibaba"
+        },
+        {
+          "rank": 10,
+          "model": "claude-fable-5",
+          "org": "Anthropic"
+        }
+      ]
+    },
+    {
+      "slug": "text/coding",
+      "category": "文本·编码",
+      "arenaSlug": "text/coding",
+      "description": "文本·编码排行榜，展示当前领域表现最优的 AI 模型。",
+      "items": [
+        {
+          "rank": 1,
+          "model": "claude-fable-5",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 2,
+          "model": "claude-opus-4-7-high",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 3,
+          "model": "claude-opus-4-6-high",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 4,
+          "model": "claude-opus-4-7",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 5,
+          "model": "claude-opus-4-6",
+          "org": "Anthropic"
+        },
+        {
+          "rank": 6,
+          "model": "gpt-6-astra-max",
+          "org": "OpenAI"
+        },
+        {
+          "rank": 7,
+          "model": "kimi-k3-max",
+          "org": "Moonshot"
+        },
+        {
+          "rank": 8,
+          "model": "muse-spark-1.3-max",
+          "org": "Meta"
+        },
+        {
+          "rank": 9,
+          "model": "muse-spark-1.2 (xHigh)",
+          "org": "Meta"
+        },
+        {
+          "rank": 10,
+          "model": "gemini-3.8-flash-high",
+          "org": "Google"
+        }
+      ]
+    }
+  ]
+}

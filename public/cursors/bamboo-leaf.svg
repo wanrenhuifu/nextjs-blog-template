@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48">
+  <defs>
+    <!-- 叶尖受光、叶根沉色（墨竹：以墨色浓淡塑体积，不用绿） -->
+    <linearGradient id="leafGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="#8A928B"/>
+      <stop offset="0.55" stop-color="#4A544C"/>
+      <stop offset="1"    stop-color="#232A25"/>
+    </linearGradient>
+    <linearGradient id="veinGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#C9CFC9"/>
+      <stop offset="1" stop-color="#9BA39C"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 叶尖固定在 (3,3)：这就是 hotspot；rotate(-45) 让叶尖指向左上 -->
+  <g transform="translate(3 3) rotate(-45) scale(1.2)">
+
+    <!-- 白色衬边：任何背景下都看得清 -->
+    <path d="M0 0 C2.6 6 7.2 12.5 7 20.5 C6.7 29 3.7 37 0.9 44
+             Q0.5 45.6 0.3 46.2
+             C-0.5 38.5 -4.5 29.5 -5.2 21.5 C-5.7 13 -2 6 0 0 Z"
+          fill="#fff" stroke="#fff" stroke-width="3.4" stroke-linejoin="round"/>
+    <path d="M0.4 45.8 C0.7 47.2 1 48.6 1.2 49.5"
+          fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/>
+
+    <!-- 叶柄 -->
+    <path d="M0.4 45.8 C0.7 47.2 1 48.6 1.2 49.5"
+          fill="none" stroke="#1A1F1B" stroke-width="1.4" stroke-linecap="round"/>
+
+    <!-- 叶身：右宽左窄，略带不对称的自然感 -->
+    <path d="M0 0 C2.6 6 7.2 12.5 7 20.5 C6.7 29 3.7 37 0.9 44
+             Q0.5 45.6 0.3 46.2
+             C-0.5 38.5 -4.5 29.5 -5.2 21.5 C-5.7 13 -2 6 0 0 Z"
+          fill="url(#leafGrad)" stroke="#14171A" stroke-width="0.7" stroke-linejoin="round"/>
+
+    <!-- 左缘高光，一点体积感 -->
+    <path d="M-0.4 3.5 C-2.7 8.5 -4.2 14 -4.1 20 C-4 26.5 -2.4 33 -0.6 38.5
+             C-1.9 32.5 -2.7 26 -2.7 19.8 C-2.7 13.8 -1.9 8 -0.4 3.5 Z"
+          fill="#fff" opacity="0.16"/>
+
+    <!-- 主脉 -->
+    <path d="M0.1 2.8 C1.5 12 1.7 24 0.6 43.5"
+          fill="none" stroke="url(#veinGrad)" stroke-width="0.9"
+          stroke-linecap="round" opacity="0.9"/>
+
+    <!-- 侧脉，顺着叶缘弧度走 -->
+    <g fill="none" stroke="#D2D8D2" stroke-width="0.45" stroke-linecap="round" opacity="0.55">
+      <path d="M1.3 11   C3.1 12.5 4.7 14.2 5.8 16.4"/>
+      <path d="M1.55 19  C3.4 20.5 4.7 22.3 5.6 24.7"/>
+      <path d="M1.4 27   C2.9 28.5 4 30.3 4.5 32.7"/>
+      <path d="M1.2 13.5 C-0.7 15 -2.2 16.8 -3.3 19.2"/>
+      <path d="M1.5 21.5 C-0.3 23 -1.7 24.9 -2.7 27.4"/>
+      <path d="M1.3 29.5 C0.1 31 -1.1 32.7 -1.9 34.8"/>
+    </g>
+  </g>
+</svg>

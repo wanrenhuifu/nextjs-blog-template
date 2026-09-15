@@ -1,0 +1,23 @@
+[
+  {
+    "name": "示例友人",
+    "url": "https://example.com",
+    "description": "把这里换成对方的站点描述",
+    "avatar": "",
+    "github": ""
+  },
+  {
+    "name": "示例友人二",
+    "url": "https://example.org",
+    "description": "avatar 留空时头像位回退为名称首字母，无需准备图片",
+    "avatar": "",
+    "github": ""
+  },
+  {
+    "name": "示例友人三",
+    "url": "https://example.net",
+    "description": "填 github 并留空 avatar，再跑 scripts/fetch-avatars.mjs 即可自动下载头像",
+    "avatar": "",
+    "github": ""
+  }
+]

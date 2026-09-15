@@ -1,0 +1,106 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  # 定时重建：用于刷新 /radar 下的抓取数据（AI 模型排行、天气预警）。
+  # 默认关闭 —— fork 后它会按你的仓库计费额度跑，且若没配 QWEATHER_KEY
+  # 只是白白重建。想启用就取消下面两行的注释（每 12 小时一次）。
+  # schedule:
+  #   - cron: '0 0,12 * * *'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          # Next 16 要求 Node >= 20.9（见 package.json 的 engines）
+          node-version: "20"
+          cache: "npm"
+
+      - name: Restore cache
+        uses: actions/cache@v5
+        with:
+          path: |
+            .next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Test
+        run: npm test
+
+      # 站点地址与 basePath 默认**自动推导**，无需任何配置：
+      #   - 仓库名为 <owner>.github.io  → 用户站点，地址在根，无 basePath
+      #   - 其他仓库名（如 fork 出来的模板）→ 项目页，地址带子路径，需 basePath
+      # 用自定义域名时，改用仓库变量覆盖（Settings → Secrets and variables →
+      # Actions → Variables，注意不是 Secrets）：
+      #   SITE_URL   例 https://blog.example.com
+      #   BASE_PATH  自定义域名下通常留空
+      - name: Resolve site URL
+        id: site
+        env:
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          CUSTOM_URL: ${{ vars.SITE_URL }}
+          CUSTOM_BASE: ${{ vars.BASE_PATH }}
+        run: |
+          if [ -n "$CUSTOM_URL" ]; then
+            echo "url=$CUSTOM_URL" >> "$GITHUB_OUTPUT"
+            echo "base_path=$CUSTOM_BASE" >> "$GITHUB_OUTPUT"
+          elif [ "$REPO" = "$OWNER.github.io" ]; then
+            echo "url=https://$OWNER.github.io" >> "$GITHUB_OUTPUT"
+            echo "base_path=" >> "$GITHUB_OUTPUT"
+          else
+            echo "url=https://$OWNER.github.io/$REPO" >> "$GITHUB_OUTPUT"
+            echo "base_path=/$REPO" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build with Next.js
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ steps.site.outputs.url }}
+          NEXT_PUBLIC_BASE_PATH: ${{ steps.site.outputs.base_path }}
+          NEXT_PUBLIC_WALINE_SERVER_URL: ${{ secrets.WALINE_SERVER_URL }}
+          QWEATHER_KEY: ${{ secrets.QWEATHER_KEY }}
+          QWEATHER_HOST: ${{ secrets.QWEATHER_HOST }}
+        run: npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: ./out
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

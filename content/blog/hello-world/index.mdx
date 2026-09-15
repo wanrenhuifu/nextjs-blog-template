@@ -1,0 +1,60 @@
+---
+title: "第一篇文章"
+pubDate: 2026-01-01
+description: "示例文章：演示 frontmatter 字段与最常用的几种语法。"
+tags: ["示例"]
+category: 随笔
+tocDepth: 2
+---
+
+这是一篇占位示例文章，用来演示 frontmatter 与最常用的几种语法。可以直接删掉它，或把内容改成你自己的第一篇。
+
+## Frontmatter
+
+顶部的 `---` 之间是 frontmatter，`title` 与 `pubDate` 必填，其余可选。各字段含义见 `content/AGENTS.md`。
+
+## 正文
+
+普通段落、**加粗**、*斜体*、`行内代码`，以及[链接](https://example.com)。
+
+### 代码块
+
+标注语言后会由 Shiki 高亮：
+
+```ts
+export function greet(name: string) {
+  return `你好，${name}`;
+}
+```
+
+### 列表与引用
+
+- 列表项一
+- 列表项二
+
+> 引用块用于摘录或强调。
+
+### 表格
+
+| 字段 | 必填 | 说明 |
+|------|------|------|
+| `title` | 是 | 文章标题 |
+| `tags` | 否 | 用于标签聚合页 |
+
+### 数学公式
+
+行内 `$E = mc^2$`，块级：
+
+$$
+\int_0^1 x^2 \, dx = \frac{1}{3}
+$$
+
+### 图片
+
+图片文件放在 `public/blog/<slug>/` 下，正文用绝对路径引用：
+
+```mdx
+![示意图](/blog/hello-world/diagram.webp)
+```
+
+目录结构与命名约定见 `public/AGENTS.md`。
